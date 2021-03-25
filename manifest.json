@@ -1,0 +1,12 @@
+{
+  "name": "Jo's Movies",
+  "short_name": "josMovies",
+  "start_url": "/home.html",
+  "display": "standalone",
+  "background_color": "#0f1416",
+  "theme_color": "#38aeb9",
+  "orientation": "portrait-primary",
+  "icons" : [
+    {}
+  ]
+}
