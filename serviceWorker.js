@@ -13,8 +13,8 @@ Copyright 2015, 2019, 2020, 2021 Google LLC. All Rights Reserved.
 
 
 
-const DYNAMIC_CACHE = "dynamic-v1"
-const STATIC_CACHE = "static-v1"
+const DYNAMIC_CACHE = "dynamic-v2"
+const STATIC_CACHE = "static-v2"
 
 const STATIC_ASSETS = [
   '/',
@@ -36,6 +36,19 @@ const STATIC_ASSETS = [
   'https://fonts.googleapis.com/icon?family=Material+Icons',
   'https://fonts.gstatic.com/s/materialicons/v82/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2'
 ]
+
+//limit cache size 
+const maxCacheSize = (cacheName, maxSize) => {
+  caches.open(cacheName)
+  .then(cache => { cache.keys()
+    .then(keys => {
+      if (keys.length > maxSize) {
+        cache.delete(keys[0])
+        .then(maxCacheSize(cacheName, maxSize)) // recalling function over and over again until if argument is no longer true
+      }
+    })
+  })
+}
 
 // listen when service worker is installed - caching
 self.addEventListener('install', event => {
@@ -79,6 +92,7 @@ self.addEventListener('fetch', event => {
         .then(async fetchResponse => {
           const dynamicCache = await caches.open(DYNAMIC_CACHE)
           dynamicCache.put(event.request.url, fetchResponse.clone()) // put the clone of that fetch response inside the class - movie results and suggested movies pages
+          maxCacheSize(DYNAMIC_CACHE, 50) // this is where we are limiting the number of items on dynamic cache
           return fetchResponse // return the actual fetch response
         }) 
       })
