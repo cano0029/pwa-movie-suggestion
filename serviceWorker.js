@@ -13,7 +13,7 @@ Copyright 2015, 2019, 2020, 2021 Google LLC. All Rights Reserved.
 
 
 
-
+const DYNAMIC_CACHE = "dynamic-v1"
 const STATIC_CACHE = "static-v1"
 const STATIC_ASSETS = [
   '/',
@@ -21,7 +21,7 @@ const STATIC_ASSETS = [
   '/pages/404.html',
   '/css/app.css',
   '/css/materialize.min.css',
-  // '/js/app.js',
+  '/js/app.js',
   '/js/materialize.min.js',
   '/img/icons/android-chrome-192x192.png',
   '/img/icons/android-chrome-512x512.png',
@@ -37,13 +37,12 @@ const STATIC_ASSETS = [
 
 // listen when service worker is installed - caching
 self.addEventListener('install', event => {
-
   // adding static cache assets
   event.waitUntil(
     (async () => {
       const cache = await caches.open(STATIC_CACHE)
       console.log('Caching static assets')
-      await cache.addAll(STATIC_ASSETS)
+      await cache.addAll(STATIC_ASSETS) // goes to the server and finds the assets to put into static cache
     })()
   )
   // Force the waiting service worker to become the active service worker without the user having to reload the page
@@ -53,7 +52,6 @@ self.addEventListener('install', event => {
 
 // activate event
 self.addEventListener('activate', event => {
-
   //delete old caches and use most recent one
   event.waitUntil(
     caches.keys().then(keys => { // go through caches and looks for those keys (our cache)
@@ -69,13 +67,20 @@ self.addEventListener('activate', event => {
   console.log('Service worker has been activated')
 })
 
-//listens for fetch events
+//fetch events
 self.addEventListener('fetch', event => {
+
   // if request is inside our cache, return it from our cache- better offline experience
   event.respondWith(
-    caches.match(event.request).then(cacheResponse => {
-      return cacheResponse || fetch(event.request) // if we do not have it in cache, do not return cacheResponse but return the normal fetch request
-    })
+    caches.match(event.request)
+      .then(staticCacheResponse => {
+        return staticCacheResponse || fetch(event.request) // if we do not have it in cache, do not return cacheResponse but return the normal fetch request
+        .then(async fetchResponse => {
+          const dynamicCache = await caches.open(DYNAMIC_CACHE)
+          dynamicCache.put(event.request.url, fetchResponse.clone()) // put the clone of that fetch response inside the class - movie results and suggested movies pages
+          return fetchResponse // return the actual fetch response
+        }) 
+      })
   )
 })
 
