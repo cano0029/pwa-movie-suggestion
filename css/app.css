@@ -41,9 +41,22 @@ a.brand-logo{
 span.movie-logo {
   color: #00bfa5;
 }
+
 /* search and suggested pages */
 #titlePage h5 {
   margin-top: 2rem;
   margin-bottom: 2rem;
   font-size: 1rem;
+}
+
+/* offline page */
+#offline {
+  margin-top: 4rem;
+}
+#offline h5, span#button{
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+#cloud-off{
+  font-size: 4rem;
 }

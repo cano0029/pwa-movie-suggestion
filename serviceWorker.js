@@ -32,7 +32,8 @@ const STATIC_ASSETS = [
   '/img/icons/mstile-150x150.png',
   '/img/icons/safari-pinned-tab.svg',
   '/img/logo/logo.png',
-  'https://fonts.googleapis.com/icon?family=Material+Icons'
+  'https://fonts.googleapis.com/icon?family=Material+Icons',
+  'https://fonts.gstatic.com/s/materialicons/v82/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2'
 ]
 
 // listen when service worker is installed - caching
@@ -57,9 +58,11 @@ self.addEventListener('activate', event => {
     caches.keys().then(keys => { // go through caches and looks for those keys (our cache)
       // console.log(keys)
       return Promise.all(keys
-        .filter(key => key !== STATIC_CACHE) // filter through cache
+        .filter(key => key !== STATIC_CACHE && key !== DYNAMIC_CACHE) // filter through static cache
         .map(key => caches.delete(key)) // delete several old caches that does not equal current static cache name
       )
+
+      // TO DO: filter out old dynamic cahces
     })
   )
   // Tell the active service worker to take control of the page(s) immediately. User will not have to refresh the browser twice to make new service worker active
@@ -69,7 +72,6 @@ self.addEventListener('activate', event => {
 
 //fetch events
 self.addEventListener('fetch', event => {
-
   // if request is inside our cache, return it from our cache- better offline experience
   event.respondWith(
     caches.match(event.request)
@@ -81,6 +83,7 @@ self.addEventListener('fetch', event => {
           return fetchResponse // return the actual fetch response
         }) 
       })
+      .catch(() => caches.match('/pages/404.html'))
   )
 })
 
