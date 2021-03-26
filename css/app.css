@@ -1,5 +1,3 @@
-
-
 /* general - applicable to all pages*/
 
 html {
@@ -29,7 +27,6 @@ a.brand-logo{
 
 /* search and suggested pages */
 #titlePage h5 {
-  /* margin: 2rem; */
   margin-top: 2rem;
   margin-bottom: 2rem;
   font-size: 1rem;
