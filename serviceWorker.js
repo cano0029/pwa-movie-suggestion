@@ -58,11 +58,11 @@ self.addEventListener('activate', event => {
     caches.keys().then(keys => { // go through caches and looks for those keys (our cache)
       // console.log(keys)
       return Promise.all(keys
-        .filter(key => key !== STATIC_CACHE && key !== DYNAMIC_CACHE) // filter through static cache
+        .filter(key => (key !== STATIC_CACHE && key !== DYNAMIC_CACHE)) // filter through static cache
         .map(key => caches.delete(key)) // delete several old caches that does not equal current static cache name
       )
 
-      // TO DO: filter out old dynamic cahces
+      // TO DO: filter out old dynamic caches
     })
   )
   // Tell the active service worker to take control of the page(s) immediately. User will not have to refresh the browser twice to make new service worker active
