@@ -15,6 +15,7 @@ Copyright 2015, 2019, 2020, 2021 Google LLC. All Rights Reserved.
 
 const DYNAMIC_CACHE = "dynamic-v1"
 const STATIC_CACHE = "static-v1"
+
 const STATIC_ASSETS = [
   '/',
   '/home.html', 
