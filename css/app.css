@@ -18,6 +18,7 @@ input#search {
 }
 .input-field{
   border-radius: 40px;
+  height: 1rem;
 }
 .nav-wrapper{
   background-color: #0F1416;
