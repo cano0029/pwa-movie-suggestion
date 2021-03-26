@@ -37,6 +37,8 @@ const STATIC_ASSETS = [
 
 // listen when service worker is installed - caching
 self.addEventListener('install', event => {
+
+  // adding static cache assets
   event.waitUntil(
     (async () => {
       const cache = await caches.open(STATIC_CACHE)
@@ -51,6 +53,8 @@ self.addEventListener('install', event => {
 
 // activate event
 self.addEventListener('activate', event => {
+
+  //delete old caches and use most recent one
   event.waitUntil(
     caches.keys().then(keys => { // go through caches and looks for those keys (our cache)
       // console.log(keys)
@@ -67,8 +71,7 @@ self.addEventListener('activate', event => {
 
 //listens for fetch events
 self.addEventListener('fetch', event => {
-  // if request is inside our cache, return it from our cache
-  // better offline experience
+  // if request is inside our cache, return it from our cache- better offline experience
   event.respondWith(
     caches.match(event.request).then(cacheResponse => {
       return cacheResponse || fetch(event.request) // if we do not have it in cache, do not return cacheResponse but return the normal fetch request
