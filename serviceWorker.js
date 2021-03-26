@@ -62,8 +62,6 @@ self.addEventListener('activate', event => {
         .filter(key => (key !== STATIC_CACHE && key !== DYNAMIC_CACHE)) // filter through static cache
         .map(key => caches.delete(key)) // delete several old caches that does not equal current static cache name
       )
-
-      // TO DO: filter out old dynamic caches
     })
   )
   // Tell the active service worker to take control of the page(s) immediately. User will not have to refresh the browser twice to make new service worker active
@@ -84,7 +82,13 @@ self.addEventListener('fetch', event => {
           return fetchResponse // return the actual fetch response
         }) 
       })
-      .catch(() => caches.match('/pages/404.html'))
+      .catch(() => {
+        const requestedPage = event.request.url.indexOf('.html')
+        if(requestedPage > -1) { // it will only show offline page if user is trying to go to a page (not when it is trying to load an image etc.)
+          return caches.match('/pages/404.html')
+        }
+        // TO DO: you can also add it for images i.e. check if it is a png and then return a dummy image that you saved in cache
+      })
   )
 })
 
