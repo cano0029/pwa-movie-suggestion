@@ -15,7 +15,12 @@ input#search {
   border: 2px grey;
   border-radius: 40px;
 }
-
+.input-field{
+  border-radius: 40px;
+}
+.nav-wrapper{
+  background-color: #0F1416;
+}
 /* home page */
 #homeInstructions {
   margin-top: 3rem;
