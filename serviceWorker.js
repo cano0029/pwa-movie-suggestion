@@ -18,21 +18,39 @@ Copyright 2015, 2019, 2020, 2021 Google LLC. All Rights Reserved.
 // Incrementing OFFLINE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 
-const OFFLINE_VERSION = 1;
-const CACHE_NAME = "offline";
-const OFFLINE_URL = "/pages/404.html"; // Customize this with a different URL if needed
+const STATIC_CACHE = "static"
+const STATIC_ASSETS = [
+  '/',
+  '/home.html',
+  '/pages/404.html',
+  '/css/app.css',
+  '/css/materialize.min.css',
+  '/js/app.js',
+  '/js/materialize.min.js',
+  '/img/icons/android-chrome-192x192.png',
+  '/img/icons/android-chrome-512x512.png',
+  '/img/icons/apple-touch-icon.png',
+  '/img/icons/favicon-16x16.png',
+  '/img/icons/favicon-32x32.png',
+  '/img/icons/favicon.ico',
+  '/img/icons/mstile-150x150.png',
+  '/img/icons/safari-pinned-tab.svg',
+  '/img/logo/logo.png',
+  'https://fonts.googleapis.com/icon?family=Material+Icons'
+]
 
-// listen when service worker is installed
+// listen when service worker is installed - caching
 self.addEventListener('install', event => {
   event.waitUntil(
     (async () => {
-      const cache = await caches.open(CACHE_NAME);
-      await cache.add(new Request(OFFLINE_URL, { cache: "reload" }));
+      const cache = await caches.open(STATIC_CACHE)
+      console.log('Caching static assets')
+      await cache.addAll(STATIC_ASSETS)
     })()
-  );
+  )
   // Force the waiting service worker to become the active service worker without the user having to reload the page
   console.log('Service worker has been installed', event)
-  self.skipWaiting(); // presses skipWaiting by itself and it triggers the activate event
+  self.skipWaiting() // presses skipWaiting by itself and it triggers the activate event
 })
 
 // activate event
@@ -40,9 +58,6 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     (async () => {
       // Enable navigation preload if it's supported.
-      // See https://developers.google.com/web/updates/2017/02/navigation-preload
-
-      // it will work perfectly fine without this = just a more optimization performance things
       if ("navigationPreload" in self.registration) {
         await self.registration.navigationPreload.enable();
       }
@@ -55,29 +70,12 @@ self.addEventListener('activate', event => {
 
 //listens for fetch events
 self.addEventListener('fetch', event => {
-  if (event.request.mode === "navigate") { // We only want to call event.respondWith() if this is a navigation request for an HTML page.
-    event.respondWith(
-      (async () => {
-        try {
-          // First, try to use the navigation preload response if it's supported. - if the browser had tried to pre-fetch the page
-          const preloadResponse = await event.preloadResponse;
-          if (preloadResponse) { 
-            return preloadResponse;
-          }
-
-          // if it was not pre-fetch, try the network- Always try the network first
-          const networkResponse = await fetch(event.request);
-          return networkResponse; 
-
-        } catch (error) { // network error.
-          // only want to respond with our offline if browser or user is trying to do something in a NEW page, not in the current page
-          console.log("Fetch failed; returning offline page instead.", error)
-          const cache = await caches.open(CACHE_NAME);
-          const cachedResponse = await cache.match(OFFLINE_URL);
-          return cachedResponse;
-        }
-      })()
-    )
-  }
+  // if request is inside our cache, return it from our cache
+  // better offline experience
+  event.respondWith(
+    caches.match(event.request).then(cacheResponse => {
+      return cacheResponse || fetch(event.request) // if we do not have it in cache, do not return cacheResponse but return the normal fetch request
+    })
+  )
 })
 

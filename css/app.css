@@ -13,8 +13,7 @@ body {
 
 input#search {
   border: 2px grey;
-  /* background: white; */
-  /* border-radius: 40px; */
+  border-radius: 40px;
 }
 
 /* home page */
