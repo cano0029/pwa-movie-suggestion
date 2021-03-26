@@ -14,18 +14,14 @@ Copyright 2015, 2019, 2020, 2021 Google LLC. All Rights Reserved.
 
 
 
-
-// Incrementing OFFLINE_VERSION will kick off the install event and force
-// previously cached resources to be updated from the network.
-
-const STATIC_CACHE = "static"
+const STATIC_CACHE = "static-v1"
 const STATIC_ASSETS = [
   '/',
-  '/home.html',
+  '/home.html', 
   '/pages/404.html',
   '/css/app.css',
   '/css/materialize.min.css',
-  '/js/app.js',
+  // '/js/app.js',
   '/js/materialize.min.js',
   '/img/icons/android-chrome-192x192.png',
   '/img/icons/android-chrome-512x512.png',
@@ -56,12 +52,13 @@ self.addEventListener('install', event => {
 // activate event
 self.addEventListener('activate', event => {
   event.waitUntil(
-    (async () => {
-      // Enable navigation preload if it's supported.
-      if ("navigationPreload" in self.registration) {
-        await self.registration.navigationPreload.enable();
-      }
-    })()
+    caches.keys().then(keys => { // go through caches and looks for those keys (our cache)
+      // console.log(keys)
+      return Promise.all(keys
+        .filter(key => key !== STATIC_CACHE) // filter through cache
+        .map(key => caches.delete(key)) // delete several old caches that does not equal current static cache name
+      )
+    })
   )
   // Tell the active service worker to take control of the page(s) immediately. User will not have to refresh the browser twice to make new service worker active
   self.clients.claim(); // but should put in checks before doing this, old service worker may be caching some sort of info for example that you may need
