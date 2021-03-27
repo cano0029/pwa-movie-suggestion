@@ -1,20 +1,6 @@
-/*
-Copyright 2015, 2019, 2020, 2021 Google LLC. All Rights Reserved.
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-*/
 
-
-
-const DYNAMIC_CACHE = "dynamic-v2"
-const STATIC_CACHE = "static-v2"
+const DYNAMIC_CACHE = "dynamic-v1"
+const STATIC_CACHE = "static-v1"
 
 const STATIC_ASSETS = [
   '/',
@@ -86,13 +72,14 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   // if request is inside our cache, return it from our cache- better offline experience
   event.respondWith(
+    // TO DO: IFFEE, async await - get rid of .then .catch nesting
     caches.match(event.request)
       .then(staticCacheResponse => {
         return staticCacheResponse || fetch(event.request) // if we do not have it in cache, do not return cacheResponse but return the normal fetch request
         .then(async fetchResponse => {
           const dynamicCache = await caches.open(DYNAMIC_CACHE)
           dynamicCache.put(event.request.url, fetchResponse.clone()) // put the clone of that fetch response inside the class - movie results and suggested movies pages
-          maxCacheSize(DYNAMIC_CACHE, 50) // this is where we are limiting the number of items on dynamic cache
+          maxCacheSize(DYNAMIC_CACHE, 20) // this is where we are limiting the number of items on dynamic cache
           return fetchResponse // return the actual fetch response
         }) 
       })
