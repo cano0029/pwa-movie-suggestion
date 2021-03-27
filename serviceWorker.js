@@ -51,22 +51,29 @@ self.addEventListener('install', event => {
   self.skipWaiting() // presses skipWaiting by itself and it triggers the activate event
 })
 
-// activate event
+// delete old caches and before activating most recent one
 self.addEventListener('activate', event => {
-  //delete old caches and use most recent one
   event.waitUntil(
-    caches.keys().then(keys => { // go through caches and looks for those keys (our cache)
-      // console.log(keys)
+    (async() => {
+      const keys = await caches.keys()
       return Promise.all(keys
-        .filter(key => (key !== STATIC_CACHE && key !== DYNAMIC_CACHE)) // filter through static cache
-        .map(key => caches.delete(key)) // delete several old caches that does not equal current static cache name
+        .filter(key => (key !== STATIC_CACHE && key !== DYNAMIC_CACHE)) 
+            .map(key => caches.delete(key))
+          )
+        })()
       )
-    })
+       // Tell the active service worker to take control of the page(s) immediately. User will not have to refresh the browser twice to make new service worker active
+      self.clients.claim(); // but should put in checks before doing this, old service worker may be caching some sort of info for example that you may need
+      console.log('Service worker has been activated')
+    }
+    // caches.keys().then(keys => { // go through caches and looks for those keys (our cache)
+    //   // console.log(keys)
+    //   return Promise.all(keys
+    //     .filter(key => (key !== STATIC_CACHE && key !== DYNAMIC_CACHE)) // filter through static cache
+    //     .map(key => caches.delete(key)) // delete several old caches that does not equal current static cache name
+    //   )
+    // })
   )
-  // Tell the active service worker to take control of the page(s) immediately. User will not have to refresh the browser twice to make new service worker active
-  self.clients.claim(); // but should put in checks before doing this, old service worker may be caching some sort of info for example that you may need
-  console.log('Service worker has been activated')
-})
 
 //fetch events
 self.addEventListener('fetch', event => {

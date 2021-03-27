@@ -4,14 +4,15 @@ const APP = {
     APP.registerServiceWorker()
   },
   registerServiceWorker () {
-    if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/serviceWorker.js')
-      .then((registration) => {
-        console.log('Service worker registered', registration)
-      })
-      .catch((error) => {
-        console.log('Service worker not registered', error)
-      })
+    try {
+      if('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/serviceWorker.js')
+          console.log('Service worker registered')
+        })
+      }
+    } catch (error) {
+      console.log('Service worker not registered', error)
     }
   }
 }
