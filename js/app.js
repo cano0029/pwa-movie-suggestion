@@ -15,8 +15,13 @@ import {
 //default DB name is 'keyval-store' (like a document DB)
 //default store name is 'keyval'    (like a Collection in the DB)
 
+const INDEXED = {
+  init () {
+    
+  }
+}
 
-const MOVIEdb = {
+const MOVIEDB = {
   /*************
         SAMPLE URLS
         
@@ -33,20 +38,11 @@ const MOVIEdb = {
   apiKey: '8b315e48d59ed2c712994a028435c067',
 
   async getMovies(keyword) {
-    let url = ''.concat(MOVIEdb.baseURL, 'search/movie?api_key=', MOVIEdb.apiKey, '&query=', keyword)
+    let url = ''.concat(MOVIEDB.baseURL, 'search/movie?api_key=', MOVIEDB.apiKey, '&query=', keyword)
     try {
       const response = await fetch(url) //the 
       if (!response.ok) throw new Error(response.message)
-      let data = response.json()
-      (function init (data){
-        let newStore = creteStore('movieDB', 'movieStore')
-        set(keyword, data, newStore)
-          .then(() => {
-            console.log('saved the info');
-          })
-          .catch(console.warn)
-      })()
-      return data
+      return response.json()
     } catch (err) {
       console.warn(err)
     }
@@ -65,6 +61,7 @@ const APP = {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/serviceWorker.js')
           console.log('Service worker registered')
+          INDEXED.init()
         })
       }
     } catch (error) {
@@ -83,8 +80,8 @@ const APP = {
   async handleFormSubmit (event) {
     // 1. with a submit event you have to put in preventDefault
     event.preventDefault() 
-    const key = event.target.movieKey.value // whatever the value is inputted in the form
-    const character = await MOVIEdb.getMovies(keyword)
+    const keyword = event.target.movieKey.value // whatever the value is inputted in the form
+    const character = await MOVIEDB.getMovies(keyword)
     // TO DO: save movie results in indexedDB
     APP.showResultsPage(character)
   }
