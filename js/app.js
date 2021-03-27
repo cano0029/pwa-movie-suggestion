@@ -1,12 +1,22 @@
-const IDB = (
-  (function init() {
-    let db = null;
-    let objectStore = null;
-    let DBOpenReq = indexedDB.open()
-  }) ()
-)
+import {
+  get, // retrieve
+  set, // save
+  getMany,
+  setMany,
+  update, // change
+  del, // delete
+  clear,
+  keys,
+  values,
+  entries,
+  createStore,
+} from 'https://cdn.jsdelivr.net/npm/idb-keyval@5/dist/esm/index.js';
+//importing all of these methods, which return Promises - we can chain then and catch to them to deal with responses
+//default DB name is 'keyval-store' (like a document DB)
+//default store name is 'keyval'    (like a Collection in the DB)
 
-const MovieDB = {
+
+const MOVIEdb = {
   /*************
         SAMPLE URLS
         
@@ -19,8 +29,28 @@ const MovieDB = {
         3. To fetch more details about a movie
         https://api.themoviedb.org/3/movie/<movie-id>?api_key=<apiKey>
   *************/
-
+  baseURL: 'https://api.themoviedb.org/3/',
   apiKey: '8b315e48d59ed2c712994a028435c067',
+
+  async getMovies(keyword) {
+    let url = ''.concat(MOVIEdb.baseURL, 'search/movie?api_key=', MOVIEdb.apiKey, '&query=', keyword)
+    try {
+      const response = await fetch(url) //the 
+      if (!response.ok) throw new Error(response.message)
+      let data = response.json()
+      (function init (data){
+        let newStore = creteStore('movieDB', 'movieStore')
+        set(keyword, data, newStore)
+          .then(() => {
+            console.log('saved the info');
+          })
+          .catch(console.warn)
+      })()
+      return data
+    } catch (err) {
+      console.warn(err)
+    }
+  }
 
 }
 
@@ -40,10 +70,24 @@ const APP = {
     } catch (error) {
       console.log('Service worker not registered', error)
     }
+    document.getElementById('movie-form').addEventListener('submit', APP.handleFormSubmit)
+  },
+  
+  showResultsPage (character) {
+    // TO DO: go to search results page, and be able to receive data from home page
+    // when you hit submit button, you want to pass on the keyword to the querystring of search results page
+    // when search page loads, take the value out of query string (keyword) then look in IndexedDb to display it
+    document.getElementById('movie-output').textContent = JSON.stringify(character, null, 2) // 2 space indent formatting
   },
 
-
-
+  async handleFormSubmit (event) {
+    // 1. with a submit event you have to put in preventDefault
+    event.preventDefault() 
+    const key = event.target.movieKey.value // whatever the value is inputted in the form
+    const character = await MOVIEdb.getMovies(keyword)
+    // TO DO: save movie results in indexedDB
+    APP.showResultsPage(character)
+  }
 }
 
 document.addEventListener('DOMContentLoaded', APP.init)

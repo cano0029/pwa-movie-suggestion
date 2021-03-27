@@ -49,20 +49,24 @@
   <!-- search bar -->
   <nav id = "searchBar" class = "container">
     <div class="nav-wrapper">
-      <form id = "movie-form">
+      <form id = "movie-form" action = "./pages/searchResults.html" method= "GET">
         <div class="input-field blue-grey darken-3">
-          <input id="search" type="search" id="movieKeyword" required  class="autocomplete">
-          <label class="label-icon" for="search"><i class="material-icons black-text">search</i></label>
+          <input type="search" id="movieKey" required  class="autocomplete">
+          <label for = "movie-keyword"class="label-icon" for="search"><i class="material-icons black-text">search</i></label>
           <i class="material-icons">close</i>
-          <button type = "submit" class = "btn-small teal accent-4" id="submitBtn">Fetch</button>
+          <a href = "./pages/searchResults.html">
+            <button type = "submit" class = "btn-small teal accent-4">Fetch</button>
+          </a>
         </div>
       </form>
     </div>
   </nav>
   
+  <div class = "white-text"><pre id = "movie-output"></pre></div>
+  
   <!-- materialize script -->
   <script type="text/javascript" src="/js/materialize.min.js"></script>
   <!-- main script -->
-  <script type="text/javascript" src="/js/app.js"></script>
+  <script type="module" src="/js/app.js"></script>
 </body>
 </html>
