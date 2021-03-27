@@ -60,43 +60,38 @@ self.addEventListener('activate', event => {
         .filter(key => (key !== STATIC_CACHE && key !== DYNAMIC_CACHE)) 
             .map(key => caches.delete(key))
           )
-        })()
-      )
-       // Tell the active service worker to take control of the page(s) immediately. User will not have to refresh the browser twice to make new service worker active
-      self.clients.claim(); // but should put in checks before doing this, old service worker may be caching some sort of info for example that you may need
-      console.log('Service worker has been activated')
-    }
-    // caches.keys().then(keys => { // go through caches and looks for those keys (our cache)
-    //   // console.log(keys)
-    //   return Promise.all(keys
-    //     .filter(key => (key !== STATIC_CACHE && key !== DYNAMIC_CACHE)) // filter through static cache
-    //     .map(key => caches.delete(key)) // delete several old caches that does not equal current static cache name
-    //   )
-    // })
+    })()
   )
+   // Tell the active service worker to take control of the page(s) immediately. User will not have to refresh the browser twice to make new service worker active
+  self.clients.claim(); // but should put in checks before doing this, old service worker may be caching some sort of info for example that you may need
+  console.log('Service worker has been activated')
+})
 
 //fetch events
 self.addEventListener('fetch', event => {
   // if request is inside our cache, return it from our cache- better offline experience
   event.respondWith(
     // TO DO: IFFEE, async await - get rid of .then .catch nesting
-    caches.match(event.request)
-      .then(staticCacheResponse => {
-        return staticCacheResponse || fetch(event.request) // if we do not have it in cache, do not return cacheResponse but return the normal fetch request
-        .then(async fetchResponse => {
-          const dynamicCache = await caches.open(DYNAMIC_CACHE)
-          dynamicCache.put(event.request.url, fetchResponse.clone()) // put the clone of that fetch response inside the class - movie results and suggested movies pages
-          maxCacheSize(DYNAMIC_CACHE, 20) // this is where we are limiting the number of items on dynamic cache
-          return fetchResponse // return the actual fetch response
-        }) 
-      })
-      .catch(() => {
+
+    (async () => {
+      const cachedResponse = await caches.match(event.request)
+      const dynamicCache = await caches.open(DYNAMIC_CACHE)
+      
+      if (cachedResponse) return cachedResponse
+    
+      try{
+        const networkResponse = await fetch(event.request)
+        dynamicCache.put(event.request.url, networkResponse.clone())
+        maxCacheSize(DYNAMIC_CACHE, 20)
+        return networkResponse
+      } catch(error) {
         const requestedPage = event.request.url.indexOf('.html')
         if(requestedPage > -1) { // it will only show offline page if user is trying to go to a page (not when it is trying to load an image etc.)
           return caches.match('/pages/404.html')
-        }
-        // TO DO: you can also add it for images i.e. check if it is a png and then return a dummy image that you saved in cache
-      })
+        } 
+      }
+    })()
+    // TO DO: you can also add it for images i.e. check if it is a png and then return a dummy image that you saved in cache
   )
 })
 
