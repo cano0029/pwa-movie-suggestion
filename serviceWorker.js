@@ -71,8 +71,6 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   // if request is inside our cache, return it from our cache- better offline experience
   event.respondWith(
-    // TO DO: IFFEE, async await - get rid of .then .catch nesting
-
     (async () => {
       const cachedResponse = await caches.match(event.request)
       const dynamicCache = await caches.open(DYNAMIC_CACHE)
