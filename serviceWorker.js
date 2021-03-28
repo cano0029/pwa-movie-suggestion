@@ -26,7 +26,7 @@ const STATIC_ASSETS = [
 
 const DYNAMIC_ASSETS = []
 
-//limit cache size 
+//limit dynamic cache size 
 const maxCacheSize = (cacheName, maxSize) => {
   caches.open(cacheName)
   .then(cache => { cache.keys()
@@ -39,7 +39,7 @@ const maxCacheSize = (cacheName, maxSize) => {
   })
 }
 
-// listen when service worker is installed - caching
+// listen when service worker is installed - then create static cache
 self.addEventListener('install', event => {
   // adding static cache assets
   event.waitUntil(
@@ -54,7 +54,7 @@ self.addEventListener('install', event => {
   self.skipWaiting() // presses skipWaiting by itself and it triggers the activate event
 })
 
-// delete old caches and before activating most recent one
+// delete old caches, before activating most recent caches version (dynamic and static)
 self.addEventListener('activate', event => {
   event.waitUntil(
     (async() => {
@@ -70,7 +70,8 @@ self.addEventListener('activate', event => {
   console.log('Service worker has been activated')
 })
 
-//fetch events
+// create and return dynamic cache
+// TO DO: control which htmls and resources (images) go into dynamic assets []
 self.addEventListener('fetch', event => {
   // if request is inside our cache, return it from our cache- better offline experience
   event.respondWith(
@@ -98,6 +99,7 @@ self.addEventListener('fetch', event => {
   )
 })
 
+// TO DO: need to fix - maybe merge it with function that is creating dynamic cache
 self.addEventListener("fetch", (event) => {
   if (event.request.mode === "navigate") {
     // only want to respond with our offline if browser or user is trying to do something in a NEW page, not in the current page
@@ -136,6 +138,12 @@ self.addEventListener("fetch", (event) => {
   // event.respondWith(), the request will be handled by the browser as if there
   // were no service worker involvement.
 });
+
+// TO DO: what is this??
+self.addEventListener('message', ({ data }) => {
+  //message received from a web page that uses this sw
+});
+
 const sendMessage = async (msg) => {
   //send a message from the service worker to the webpage(s)
   let allClients = await clients.matchAll({ includeUncontrolled: true });

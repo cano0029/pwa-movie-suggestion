@@ -15,9 +15,9 @@ import {
 //default DB name is 'keyval-store' (like a document DB)
 //default store name is 'keyval'    (like a Collection in the DB)
 
-
+const APP = {
   /*************
-        SAMPLE URLS
+        SAMPLE MOVIEDB URLS
         
         1. To get the config data like image base urls
         https://api.themoviedb.org/3/configuration?api_key=<apiKey>
@@ -28,8 +28,8 @@ import {
         3. To fetch more details about a movie
         https://api.themoviedb.org/3/movie/<movie-id>?api_key=<apiKey>
   *************/
-
-const APP = {
+  
+  apiKey: '8b315e48d59ed2c712994a028435c067',
   baseURL: 'https://api.themoviedb.org/3/',
   imgURL: 'https://image.tmdb.org/t/p/',
   backdrop_sizes: ['w300', 'w780', 'w1280', 'original'],
@@ -44,8 +44,6 @@ const APP = {
 
   isOnline: 'onLine' in navigator && navigator.onLine,
   isStandalone: false,
-
-  apiKey: '8b315e48d59ed2c712994a028435c067',
 
   init(){
     try {
@@ -98,7 +96,8 @@ const APP = {
       console.log('app was installed');
     });
 
-    //listen for submit of the search form
+    // TO DO: delete this, just a test to see of I'm getting anything from movieDB!
+    // listen for submit of the search form in home.html
     document.getElementById('searchForm').addEventListener('submit', APP.handleFormSubmit)
   },
 
@@ -116,20 +115,19 @@ const APP = {
     }
   },
 
-  /* * * * * * * NEED TO CHANGE TO BE IN LINE WITH STEVE'S CODE * * * * * * */
+  // TO DO: delete, codes below is just my own test to see if I am getting anything from movieDb
+  /******************************************************************/
   async handleFormSubmit (event) {
-    // 1. with a submit event you have to put in preventDefault
     event.preventDefault() 
     const keyword = event.target.search.value // whatever the value is inputted in the form
-    const character = await APP.getMovies(keyword)
-    // TO DO: save movie results in indexedDB
-    APP.showResultsPage(character)
+    const movies = await APP.getMovies(keyword)
+    APP.showResultsPage(movies)
   },
 
   async getMovies(keyword) {
     let url = ''.concat(APP.baseURL, 'search/movie?api_key=', APP.apiKey, '&query=', keyword)
     try {
-      const response = await fetch(url) //the 
+      const response = await fetch(url) 
       if (!response.ok) throw new Error(response.message)
       return response.json()
     } catch (err) {
@@ -137,15 +135,15 @@ const APP = {
     }
   },
 
-  showResultsPage (character) {
+  showResultsPage (movies) {
     // TO DO: go to search results page, and be able to receive data from home page
     // when you hit submit button, you want to pass on the keyword to the querystring of search results page
     // when search page loads, take the value out of query string (keyword) then look in IndexedDb to display it
 
     //currently, I am just outputting it in a div in my home.html (temporarily - wanted to see if it works)
-    document.getElementById('movie-output').textContent = JSON.stringify(character, null, 2) // 2 space indent formatting
+    document.getElementById('movie-output').textContent = JSON.stringify(movies, null, 2) // 2 space indent formatting
   },
-  /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  /**************************************************/
 
   sendMessage(msg, target) {
     //TODO:
@@ -238,25 +236,24 @@ const APP = {
   },
 
   openDB() {
-    // let db = null
-    // let moviedbStore = null
+    // TO DO: separate into smaller functions!
 
     // database open request
     let dbOpenRequest = indexedDB.open('movieDB', APP.dbVersion) // second parameter is versioning
 
+    // error with opening/creating db
     dbOpenRequest.addEventListener('error', (error) => {
-      // error with opening/creating db
       console.warn(error)
     })
 
+    // successfully loaded indexeddb database
     dbOpenRequest.addEventListener('success', (event) => {
-      // either success
       APP.db = event.target.result
       console.log('success', APP.db)
     })
 
+    // upgrading the indexeddb database i.e. creating data stores
     dbOpenRequest.addEventListener('upgradeneeded', (event) => {
-      // or upgrading 
       // creating/deleting stores can only be done in an 'upgradeneeded' event
       // will get an error if you put it somewhere else i.e. success event
       APP.db = event.target.result
@@ -280,6 +277,7 @@ const APP = {
       //   db.deleteObjectStore('suggestStore')
       // }
     })
+
     // dbOpenRequest.addEventListener('submit', (event) => {
     //   event.preventDefault()
       // one of the form buttons was clicked
