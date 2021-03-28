@@ -41,12 +41,12 @@
   <!-- search bar -->
   <nav id = "searchBar" class = "container">
     <div class="nav-wrapper">
-      <form id = "movie-form">
+      <form id = "searchForm" action = "./pages/searchResults.html" method= "GET">
         <div class="input-field blue-grey darken-3">
-          <input id="search" type="search" id="movieKeyword" required  class="autocomplete">
-          <label class="label-icon" for="search"><i class="material-icons black-text">search</i></label>
-          <i class="material-icons">close</i>
-          <button type = "submit" class = "btn-small teal accent-4" id="submitBtn">Fetch</button>
+          <input type="search" id="search" required  class="autocomplete">
+          <label for = "search" class="label-icon" for="search"><i class="material-icons black-text">search</i></label>
+          <i class="material-icons" id="closeSearchBtn">close</i>
+          <button type = "submit" class = "btn-small teal accent-4">Fetch</button>
         </div>
       </form>
     </div>

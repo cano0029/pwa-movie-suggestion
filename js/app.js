@@ -115,36 +115,6 @@ const APP = {
     }
   },
 
-  // TO DO: delete, codes below is just my own test to see if I am getting anything from movieDb
-  /******************************************************************/
-  async handleFormSubmit (event) {
-    event.preventDefault() 
-    const keyword = event.target.search.value // whatever the value is inputted in the form
-    const movies = await APP.getMovies(keyword)
-    APP.showResultsPage(movies)
-  },
-
-  async getMovies(keyword) {
-    let url = ''.concat(APP.baseURL, 'search/movie?api_key=', APP.apiKey, '&query=', keyword)
-    try {
-      const response = await fetch(url) 
-      if (!response.ok) throw new Error(response.message)
-      return response.json()
-    } catch (err) {
-      console.warn(err)
-    }
-  },
-
-  showResultsPage (movies) {
-    // TO DO: go to search results page, and be able to receive data from home page
-    // when you hit submit button, you want to pass on the keyword to the querystring of search results page
-    // when search page loads, take the value out of query string (keyword) then look in IndexedDb to display it
-
-    //currently, I am just outputting it in a div in my home.html (temporarily - wanted to see if it works)
-    document.getElementById('movie-output').textContent = JSON.stringify(movies, null, 2) // 2 space indent formatting
-  },
-  /**************************************************/
-
   sendMessage(msg, target) {
     //TODO:
     //send a message to the service worker
@@ -235,6 +205,7 @@ const APP = {
     //TO DO: build the list of cards inside the current page
   },
 
+  // creating my database in indexedDB
   openDB() {
     // TO DO: separate into smaller functions!
 
@@ -283,6 +254,39 @@ const APP = {
       // one of the form buttons was clicked
     // })
   },
+
+
+  
+  /***************************************************************** TESTING PURPOSES */
+  // TO DO: delete, codes below is just my own test to see if I am getting anything from movieDb
+  
+  async handleFormSubmit (event) {
+    event.preventDefault() 
+    const keyword = event.target.search.value // whatever the value is inputted in the form
+    const movies = await APP.getMovies(keyword)
+    APP.showResultsPage(movies)
+  },
+
+  async getMovies(keyword) {
+    let url = ''.concat(APP.baseURL, 'search/movie?api_key=', APP.apiKey, '&query=', keyword)
+    try {
+      const response = await fetch(url) 
+      if (!response.ok) throw new Error(response.message)
+      return response.json()
+    } catch (err) {
+      console.warn(err)
+    }
+  },
+
+  showResultsPage (movies) {
+    // TO DO: go to search results page, and be able to receive data from home page
+    // when you hit submit button, you want to pass on the keyword to the querystring of search results page
+    // when search page loads, take the value out of query string (keyword) then look in IndexedDb to display it
+
+    //currently, I am just outputting it in a div in my home.html (temporarily - wanted to see if it works)
+    document.getElementById('movie-output').textContent = JSON.stringify(movies, null, 2) // 2 space indent formatting
+  },
+  /**************************************************/
 }
 
 document.addEventListener('DOMContentLoaded', APP.init)

@@ -41,12 +41,14 @@
   <!-- search bar -->
   <nav id = "searchBar" class = "container">
     <div class="nav-wrapper">
-      <form id = "movie-form">
+      <form id = "searchForm" action = "./pages/searchResults.html" method= "GET">
         <div class="input-field blue-grey darken-3">
-          <input type="search" id="movieKey" required  class="autocomplete">
-          <label for = "movie-keyword"class="label-icon" for="search"><i class="material-icons black-text">search</i></label>
-          <i class="material-icons">close</i>
-          <a href = ""><button id = "submitBtn" type = "submit" class = "btn-small teal accent-4">Fetch</button></a>
+          <input type="search" id="search" required  class="autocomplete">
+          <label for = "search" class="label-icon" for="search"><i class="material-icons black-text">search</i></label>
+          <i class="material-icons" id="closeSearchBtn">close</i>
+          <a href = "./pages/searchResults.html">
+            <button type = "submit" class = "btn-small teal accent-4">Fetch</button>
+          </a>
         </div>
       </form>
     </div>
@@ -60,22 +62,6 @@
   <!-- Search Results -->
     <!-- card 1 -->
     <div class = "white-text"><pre id = "movie-output"></pre></div>
-    <!-- <div class = "container">
-      <div class="card blue-grey darken-1">
-        <div class="card-image waves-effect waves-block waves-light"> -->
-          <!-- insert image here -->
-        <!-- </div>
-        <div class="card-content">
-          <span class="card-title activator grey-text text-darken-4">Movie Title<i class="material-icons right">more_vert</i></span>
-          <p><a href="#">See similar movies</a></p>
-        </div>
-        <div class="card-reveal">
-          <span class="card-title grey-text text-darken-4">Movie Title<i class="material-icons right">close</i></span>
-          <p>Here is some more information about this product that is only revealed once clicked on.</p>
-        </div>
-      </div>
-    </div> -->
-
 
   <!-- materialize script
   <!-- <script type="text/javascript" src="/js/materialize.min.js"></script> --> -->
