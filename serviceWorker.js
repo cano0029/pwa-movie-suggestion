@@ -1,6 +1,7 @@
 
-const DYNAMIC_CACHE = "dynamic-v1"
-const STATIC_CACHE = "static-v1"
+const DYNAMIC_CACHE = "dynamic-v2"
+const STATIC_CACHE = "static-v2"
+const OFFLINE_URL = '/pages/404.html'
 
 const STATIC_ASSETS = [
   '/',
@@ -22,6 +23,8 @@ const STATIC_ASSETS = [
   'https://fonts.googleapis.com/icon?family=Material+Icons',
   'https://fonts.gstatic.com/s/materialicons/v82/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2'
 ]
+
+const DYNAMIC_ASSETS = []
 
 //limit cache size 
 const maxCacheSize = (cacheName, maxSize) => {
@@ -79,17 +82,70 @@ self.addEventListener('fetch', event => {
     
       try{
         const networkResponse = await fetch(event.request)
-        dynamicCache.put(event.request.url, networkResponse.clone())
-        maxCacheSize(DYNAMIC_CACHE, 20)
+        dynamicCache.put(event.request, networkResponse.clone())
+        // TO DO: control which assets go into dynamic cache here - suggest and movie results html as well as their images
+        // right now it is storing everything that is not already in static cache
+        maxCacheSize(DYNAMIC_CACHE, 50)
         return networkResponse
       } catch(error) {
         const requestedPage = event.request.url.indexOf('.html')
+        // TO DO: change code use OFFLINE)URL
         if(requestedPage > -1) { // it will only show offline page if user is trying to go to a page (not when it is trying to load an image etc.)
           return caches.match('/pages/404.html')
         } 
       }
     })()
-    // TO DO: you can also add it for images i.e. check if it is a png and then return a dummy image that you saved in cache
   )
 })
+
+self.addEventListener("fetch", (event) => {
+  if (event.request.mode === "navigate") {
+    // only want to respond with our offline if browser or user is trying to do something in a NEW page, not in the current page
+    event.respondWith(
+      (async () => {
+        try {
+          const preloadResponse = await event.preloadResponse;
+          if (preloadResponse) { // if we yes, return that page
+            return preloadResponse;
+          }
+
+          // if it was not pre-fetch, try the network
+          // Always try the network 
+          const networkResponse = await fetch(event.request);
+          return networkResponse; // if yes, return that page
+
+        } catch (error) {
+          // catch is only triggered if an exception is thrown, which is likely
+          // due to a network error.
+          // If fetch() returns a valid HTTP response with a response code in
+          // the 4xx or 5xx range, the catch() will NOT be called.
+          console.log("Fetch failed; returning offline page instead.", error);
+
+          // if error, return that cached page during initialize
+          const cache = await caches.open(STATIC_CACHE);
+          const cachedResponse = await cache.match(OFFLINE_URL);
+          return cachedResponse;
+        }
+      })()
+    );
+  }
+
+  // If our if() condition is false, then this fetch handler won't intercept the
+  // request. If there are any other fetch handlers registered, they will get a
+  // chance to call event.respondWith(). If no fetch handlers call
+  // event.respondWith(), the request will be handled by the browser as if there
+  // were no service worker involvement.
+});
+const sendMessage = async (msg) => {
+  //send a message from the service worker to the webpage(s)
+  let allClients = await clients.matchAll({ includeUncontrolled: true });
+  return Promise.all(
+    allClients.map((client) => {
+      let channel = new MessageChannel();
+      channel.port1.onmessage = onMessage;
+      //port1 for send port2 for receive
+      return client.postMessage(msg, [channel.port2]);
+    })
+  );
+};
 
