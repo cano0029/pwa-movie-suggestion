@@ -143,7 +143,7 @@ const APP = {
 
   useSearchResults(keyword) {
     //after getting fetch or db results
-    //display search keyword in title
+    //display search keyword in pages title i.e. Showing search results for <keyword>
     //then call buildList
     let movies = APP.results;
     let keywordSpan = document.querySelector('.ref-keyword');
@@ -205,14 +205,14 @@ const APP = {
     //TO DO: build the list of cards inside the current page
   },
 
-  // creating my database in indexedDB
+  // creating my database in indexedDB - using vanilla javascript
   openDB() {
     // TO DO: separate into smaller functions!
 
-    // database open request
+    // create database
     let dbOpenRequest = indexedDB.open('movieDB', APP.dbVersion) // second parameter is versioning
 
-    // error with opening/creating db
+    // error with opening/creating database
     dbOpenRequest.addEventListener('error', (error) => {
       console.warn(error)
     })
@@ -223,7 +223,7 @@ const APP = {
       console.log('success', APP.db)
     })
 
-    // upgrading the indexeddb database i.e. creating data stores
+    // upgrading the indexeddb database i.e. creating data stores within your newly created database
     dbOpenRequest.addEventListener('upgradeneeded', (event) => {
       // creating/deleting stores can only be done in an 'upgradeneeded' event
       // will get an error if you put it somewhere else i.e. success event
@@ -231,7 +231,7 @@ const APP = {
       console.log('upgrade', APP.db)
 
       // check to see which db version you are in
-      // will get this message every time you update the versioin
+      // will get this message every time you update the version
       let oldVersion = event.oldVersion
       let newVersion = event.newVersion || APP.db.version
       console.log('DB updated from version', oldVersion, 'to', newVersion)
@@ -249,7 +249,7 @@ const APP = {
       // }
     })
 
-    // dbOpenRequest.addEventListener('submit', (event) => {
+    // APP.dbOpenRequest.addEventListener('submit', (event) => {
     //   event.preventDefault()
       // one of the form buttons was clicked
     // })
@@ -263,8 +263,41 @@ const APP = {
   async handleFormSubmit (event) {
     event.preventDefault() 
     const keyword = event.target.search.value // whatever the value is inputted in the form
-    const movies = await APP.getMovies(keyword)
-    APP.showResultsPage(movies)
+    console.log('The keyword you entered is:', keyword)
+
+    let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
+    
+    const response = await fetch(url) 
+
+    try {
+      if (!response.ok) throw new Error(response.message)
+        let movieResults = {
+          keyword: keyword,
+          results: await response.json()
+        }
+      APP.saveMoves(movieResults)
+    } catch (err) {
+      console.warn(err)
+    }
+  },
+
+  saveMoves (movieResults) {
+    // transaction- request to add data
+    let transaction = APP.db.transaction('movieStore', 'readwrite');
+    transaction.oncomplete = (ev) => {
+      console.log(ev);
+      //buildList()
+    };
+
+    let store = transaction.objectStore('movieStore');
+    let request = store.add(movieResults);
+
+    request.onsuccess = (ev) => {
+      console.log('successfully added an object', ev);
+    };
+    request.onerror = (error) => {
+      console.log('error in request to add', error);
+    };
   },
 
   async getMovies(keyword) {
@@ -287,6 +320,7 @@ const APP = {
     document.getElementById('movie-output').textContent = JSON.stringify(movies, null, 2) // 2 space indent formatting
   },
   /**************************************************/
+
 }
 
 document.addEventListener('DOMContentLoaded', APP.init)
