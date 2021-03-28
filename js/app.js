@@ -10,14 +10,62 @@ import {
   values,
   entries,
   createStore,
-} from 'https://cdn.jsdelivr.net/npm/idb-keyval@5/dist/esm/index.js';
+} from 'idb-keyval';
 //importing all of these methods, which return Promises - we can chain then and catch to them to deal with responses
 //default DB name is 'keyval-store' (like a document DB)
 //default store name is 'keyval'    (like a Collection in the DB)
 
 const INDEXED = {
   init () {
-    
+    let db = null
+    let moviedbStore = null
+    let suggestStore = null
+
+    // database open request
+    let dbOpenRequest = indexedDB.open('movieDB', 3) // second parameter is versioning
+
+    dbOpenRequest.addEventListener('error', (error) => {
+      // error with opening/creating db
+      console.warn(error)
+    })
+
+    dbOpenRequest.addEventListener('success', (event) => {
+      // either success
+      db = event.target.result
+      console.log('success', db)
+    })
+
+    dbOpenRequest.addEventListener('upgradeneeded', (event) => {
+      // or upgrading 
+      // creating/deleting stores can only be done in an 'upgradeneeded' event
+      // will get an error if you put it somewhere else i.e. success event
+      db = event.target.result
+      console.log('upgrade', db)
+
+      // check to see which db version you are in
+      // will get this message every time you update the versioin
+      let oldVersion = event.oldVersion
+      let newVersion = event.newVersion || db.version
+      console.log('DB updated from version', oldVersion, 'to', newVersion)
+      
+      // you have to check to see if store already exists
+      // will result in error if you change the version because it will try to create it again but it already exists
+      if( !db.objectStoreNames.contains('movieStore' && 'suggestStore')) {
+        moviedbStore = db.createObjectStore('movieStore', { keyPath: 'keyword' })
+        db.createObjectStore('suggestStore', { keyPath: 'id'})
+      }
+      
+      
+      // deleting a store
+      // if (db.objectStoreNames.contains('suggestStore')){
+      //   db.deleteObjectStore('suggestStore')
+      // }
+    })
+
+    dbOpenRequest.addEventListener('submit', (event) => {
+      event.preventDefault()
+      // one of the form buttons was clicked
+    })
   }
 }
 
