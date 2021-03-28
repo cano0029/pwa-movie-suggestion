@@ -219,6 +219,7 @@ const APP = {
     dbOpenRequest.addEventListener('success', (event) => {
       APP.db = event.target.result
       console.log('success', APP.db)
+      // APP.buildList() // if you reload the page, data on the page is still there
     })
 
     // upgrading the indexeddb database i.e. creating data stores within your newly created database
@@ -317,7 +318,7 @@ const APP = {
 
   buildList: (movieResults) => {
     let container = document.querySelector('.movies')
-    container.innerHTML = `<li class = "white-text"> Loading...<li>`
+    container.innerHTML = ``
 
     let transaction = APP.makeTransaction('movieStore', 'readonly')
     transaction.oncomplete = (event) => {
