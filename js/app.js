@@ -256,7 +256,8 @@ const APP = {
   // TO DO: queryString, make searchResults and suggestMovies page show up
   // NOTE: testing it on my searchResults page
   // so far, I have successfully saved whatever it is I input in the search form i.e. keyword into movieStore in indexedDB
-  // I have also retrieved data from indexedDB and display it onto page as cards
+  // I have also display it onto page as cards
+  // TO DO: BUT im not actually checking if it exists in indexedDB first and then display that
   
   async handleFormSubmit (event) {
     // TO DO: move to getData function
@@ -316,7 +317,6 @@ const APP = {
 
   buildList: (movieResults) => {
     let container = document.querySelector('.movies')
-    console.log(container)
     container.innerHTML = `<li class = "white-text"> Loading...<li>`
 
     let transaction = APP.makeTransaction('movieStore', 'readonly')
@@ -332,6 +332,9 @@ const APP = {
       let request = event.target // request === getRequest === event.target
       console.log({request})
 
+      // TO DO: check db first and return those results instead of fetching
+      // I'm not actually going into my indexedDB and returning a previously saved data
+      // Im just going to TMDB fetch results and displaying that
       let searchData = movieResults.results // info from fetch
       container.innerHTML = searchData.results // under results
       .map( movie => {
