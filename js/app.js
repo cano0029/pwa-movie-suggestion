@@ -131,7 +131,7 @@ const APP = {
       //check the db
       //if no matches make a fetch call to TMDB API
       //or make the fetch call and intercept it in the SW
-      let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`;
+      let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
 
       APP.getData(url, (data) => {
         //this is the CALLBACK to run after the fetch
@@ -268,7 +268,7 @@ const APP = {
   },
 
   async getMovies(keyword) {
-    let url = ''.concat(APP.baseURL, 'search/movie?api_key=', APP.apiKey, '&query=', keyword)
+    let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
     try {
       const response = await fetch(url) 
       if (!response.ok) throw new Error(response.message)
