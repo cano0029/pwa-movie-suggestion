@@ -256,7 +256,7 @@ const APP = {
   },
 
 
-  
+
   /***************************************************************** TESTING PURPOSES */
   // TO DO: delete, codes below is just my own test to see if I am getting anything from movieDb
   
@@ -283,7 +283,7 @@ const APP = {
     // when you hit submit button, you want to pass on the keyword to the querystring of search results page
     // when search page loads, take the value out of query string (keyword) then look in IndexedDb to display it
 
-    //currently, I am just outputting it in a div in my home.html (temporarily - wanted to see if it works)
+    //currently, I am just outputting it in a div I created in my home.html (temporary - wanted to see if it works)
     document.getElementById('movie-output').textContent = JSON.stringify(movies, null, 2) // 2 space indent formatting
   },
   /**************************************************/
