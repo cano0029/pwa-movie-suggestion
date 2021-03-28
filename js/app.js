@@ -333,7 +333,7 @@ const APP = {
       let request = event.target // request === getRequest === event.target
       console.log({request})
 
-      // TO DO: check db first and return those results instead of fetching
+      // TO DO: check db first and return those results instead of fetching if they exist
       // I'm not actually going into my indexedDB and returning a previously saved data
       // Im just going to TMDB fetch results and displaying that
       let searchData = movieResults.results // info from fetch
