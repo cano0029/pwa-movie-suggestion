@@ -205,7 +205,7 @@ const APP = {
     //TO DO: build the list of cards inside the current page
   },
 
-  // creating my database in indexedDB - using vanilla javascript
+  // creating my movie database in indexedDB - using vanilla javascript
   openDB() {
     // TO DO: separate into smaller functions!
 
@@ -237,8 +237,9 @@ const APP = {
       console.log('DB updated from version', oldVersion, 'to', newVersion)
       
       // you have to check to see if store already exists
-      // will result in error if you change the version because it will try to create it again but it already exists
-      if( !APP.db.objectStoreNames.contains('movieStore' && 'suggestStore')) {
+      // will result in error if you change the db version because it will try to create it again but it already exists
+      if( !APP.db.objectStoreNames.contains('movieStore' && 'suggestStore')) { 
+        // keyPath can be whatever you define it as, here I am doing keyword (entered in the form) and movie id - which we will use later
         APP.moviedbStore = APP.db.createObjectStore('movieStore', { keyPath: 'keyword' })
         APP.db.createObjectStore('suggestStore', { keyPath: 'id'})
       }
@@ -248,32 +249,29 @@ const APP = {
       //   db.deleteObjectStore('suggestStore')
       // }
     })
-
-    // APP.dbOpenRequest.addEventListener('submit', (event) => {
-    //   event.preventDefault()
-      // one of the form buttons was clicked
-    // })
   },
 
 
 
-  /***************************************************************** TESTING PURPOSES */
-  // TO DO: delete, codes below is just my own test to see if I am getting anything from movieDb
+  /***************************************************************** MY CODE */
+  // TO DO: merge with Steve's code
+  // NOTE: so far, I have successfully saved whatever it is I input in the search form i.e. keyword into movieStore in indexedDB
   
   async handleFormSubmit (event) {
+    // TO DO: move to getData function
+    // fetching the movie data
     event.preventDefault() 
     const keyword = event.target.search.value // whatever the value is inputted in the form
     console.log('The keyword you entered is:', keyword)
 
     let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
-    
     const response = await fetch(url) 
 
     try {
       if (!response.ok) throw new Error(response.message)
         let movieResults = {
-          keyword: keyword,
-          results: await response.json()
+          keyword: keyword, // TO DO: switch to ES6 modules in type script (package.json)
+          results: await response.json() // since it is in a promise, must await it - rejects it if I do it in another way
         }
       APP.saveMoves(movieResults)
     } catch (err) {
@@ -282,15 +280,17 @@ const APP = {
   },
 
   saveMoves (movieResults) {
-    // transaction- request to add data
-    let transaction = APP.db.transaction('movieStore', 'readwrite');
+    // saving movie results data into indexedDB - movieStores
+
+    // transaction- request to add, delete, update, take from indexedDB stores etc.
+    let transaction = APP.makeTransaction('movieStore', 'readwrite');
     transaction.oncomplete = (ev) => {
       console.log(ev);
-      //buildList()
+      //APP.buildList() // TO DO: displaying the data
     };
 
     let store = transaction.objectStore('movieStore');
-    let request = store.add(movieResults);
+    let request = store.add(movieResults); // adds it into movieStore in indexedDB
 
     request.onsuccess = (ev) => {
       console.log('successfully added an object', ev);
@@ -300,24 +300,21 @@ const APP = {
     };
   },
 
-  async getMovies(keyword) {
-    let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
-    try {
-      const response = await fetch(url) 
-      if (!response.ok) throw new Error(response.message)
-      return response.json()
-    } catch (err) {
-      console.warn(err)
+  makeTransaction (storeName, mode) {
+    // in a separate function because will be using it again and again later when requesting different things from indexedDB
+    // transaction- request to add, delete, update, take from indexedDB stores etc.
+    let transaction = APP.db.transaction(storeName, mode)
+    transaction.onerror = (error) => {
+      console.log(error)
     }
+    return transaction
   },
 
-  showResultsPage (movies) {
+  // TO D0 - doing nothing right now
+  showResultsPage () {
     // TO DO: go to search results page, and be able to receive data from home page
     // when you hit submit button, you want to pass on the keyword to the querystring of search results page
     // when search page loads, take the value out of query string (keyword) then look in IndexedDb to display it
-
-    //currently, I am just outputting it in a div I created in my home.html (temporary - wanted to see if it works)
-    document.getElementById('movie-output').textContent = JSON.stringify(movies, null, 2) // 2 space indent formatting
   },
   /**************************************************/
 
