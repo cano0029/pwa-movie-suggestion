@@ -32,6 +32,7 @@ const APP = {
   apiKey: '8b315e48d59ed2c712994a028435c067',
   baseURL: 'https://api.themoviedb.org/3/',
   imgURL: 'https://image.tmdb.org/t/p/',
+  noImgUrl: '/img/gr-stocks-q8P8YoR6erg-unsplash.jpg',
   backdrop_sizes: ['w300', 'w780', 'w1280', 'original'],
   logo_sizes: ['w45', 'w92', 'w154', 'w185', 'w300', 'w500', 'original'],
   poster_sizes: ['w92', 'w154', 'w185', 'w342', 'w500', 'w780', 'original'],
@@ -99,6 +100,7 @@ const APP = {
     // TO DO: delete this, just a test to see of I'm getting anything from movieDB!
     // listen for submit of the search form in home.html
     document.getElementById('searchForm').addEventListener('submit', APP.handleFormSubmit)
+    document.getElementById('closeSearchBtn').addEventListener('click', APP.clearForm)
   },
 
   checkVersion () {
@@ -201,8 +203,6 @@ const APP = {
       });
   },
 
-
-
   // creating my movie database in indexedDB - using vanilla javascript
   openDB() {
     // TO DO: separate into smaller functions!
@@ -253,7 +253,10 @@ const APP = {
 
   /***************************************************************** MY CODE */
   // TO DO: merge with Steve's code
-  // NOTE: so far, I have successfully saved whatever it is I input in the search form i.e. keyword into movieStore in indexedDB
+  // TO DO: queryString, make searchResults and suggestMovies page show up
+  // NOTE: testing it on my searchResults page
+  // so far, I have successfully saved whatever it is I input in the search form i.e. keyword into movieStore in indexedDB
+  // I have also retrieved data from indexedDB and display it onto page as cards
   
   async handleFormSubmit (event) {
     // TO DO: move to getData function
@@ -271,27 +274,30 @@ const APP = {
           keyword: keyword, // TO DO: switch to ES6 modules in type script (package.json)
           results: await response.json() // since it is in a promise, must await it - rejects it if I do it in another way
         }
-      APP.saveMoves(movieResults)
+      APP.saveMovies(movieResults)
     } catch (err) {
       console.warn(err)
     }
   },
 
-  saveMoves (movieResults) {
+  saveMovies (movieResults) {
     // saving movie results data into indexedDB - movieStores
 
     // transaction- request to add, delete, update, take from indexedDB stores etc.
     let transaction = APP.makeTransaction('movieStore', 'readwrite');
     transaction.oncomplete = (ev) => {
-      console.log(ev);
-      //APP.buildList() // TO DO: displaying the data
+      console.log(ev)
+      APP.buildList(movieResults) 
+      APP.clearForm()
     };
 
     let store = transaction.objectStore('movieStore');
-    let request = store.add(movieResults); // adds it into movieStore in indexedDB
+    let request = store.add(movieResults); // adds new object into movieStore in indexedDB
 
     request.onsuccess = (ev) => {
-      console.log('successfully added an object', ev);
+      console.log('successfully added an object', ev); // that the add request is a success
+      // after this is done, move on to the next request in the transaction 
+      // or if the final transaction complete and commit it (happens automatically)
     };
     request.onerror = (error) => {
       console.log('error in request to add', error);
@@ -308,9 +314,62 @@ const APP = {
     return transaction
   },
 
-  buildList: (movies) => {
-    //TO DO: build the list of cards inside the current page
+  buildList: (movieResults) => {
+    let container = document.querySelector('.movies')
+    console.log(container)
+    container.innerHTML = `<li class = "white-text"> Loading...<li>`
+
+    let transaction = APP.makeTransaction('movieStore', 'readonly')
+    transaction.oncomplete = (event) => {
+      // transaction for reading all objs is complete
+      console.log(event)
+    }
+    let store = transaction.objectStore('movieStore')
+    let getRequest = store.getAll() //returns an array
+    
+    getRequest.onsuccess = (event) => {
+      // getAll was successful
+      let request = event.target // request === getRequest === event.target
+      console.log({request})
+
+      let searchData = movieResults.results // info from fetch
+      container.innerHTML = searchData.results // under results
+      .map( movie => {
+        let img = './img/icon-512x512.png';
+        if (movie.poster_path != null) {
+          img = APP.imgURL + 'w500/' + movie.poster_path;
+        } else {
+          // TO DO: if no image found, load a dummy image
+          img = APP.noImgUrl
+        }
+        return `<div class="card hoverable large" data-id="${movie.id}">
+        <div class="card-image">
+          <img src="${img}" alt="movie poster" class="notmaterialboxed"/>
+          </div>
+        <div class="card-content activator">
+          <h3 class="card-title"><span>${movie.title}</span><i class="material-icons right">more_vert</i></h3>
+        </div>
+        <div class="card-reveal">
+          <span class="card-title grey-text text-darken-4">${movie.title}<i class="material-icons right">close</i></span>
+          <h6>${movie.release_date}</h6>
+          <p>${movie.overview}</p>
+        </div>
+        <div class="card-action">
+          <a href="#" class="find-suggested light-blue-text text-darken-3">Show Similar<i class="material-icons right">search</i></a>
+        </div>
+      </div>`
+      }).join('\n') // array of html that will be joined together
+    }
+    getRequest.onerror = (error) => {
+      console.warn(error)
+    }
   },
+
+  clearForm (event) {
+    // clears the form 
+    if (event) event.preventDefault() // prevents the page from reloading
+    document.getElementById('searchForm').reset() 
+  }
   /**************************************************/
 
 }
