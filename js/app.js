@@ -141,6 +141,7 @@ const APP = {
         APP.useSearchResults(keyword);
       });
     }
+    document.getElementById
   },
 
   useSearchResults(keyword) {
