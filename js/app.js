@@ -339,7 +339,6 @@ const APP = {
         if (movie.poster_path != null) {
           img = APP.imgURL + 'w500/' + movie.poster_path;
         } else {
-          // TO DO: if no image found, load a dummy image
           img = APP.noImgUrl
         }
         return `<div class="card hoverable large" data-id="${movie.id}">
