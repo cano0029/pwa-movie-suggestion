@@ -201,9 +201,7 @@ const APP = {
       });
   },
 
-  buildList: (movies) => {
-    //TO DO: build the list of cards inside the current page
-  },
+
 
   // creating my movie database in indexedDB - using vanilla javascript
   openDB() {
@@ -310,11 +308,8 @@ const APP = {
     return transaction
   },
 
-  // TO D0 - doing nothing right now
-  showResultsPage () {
-    // TO DO: go to search results page, and be able to receive data from home page
-    // when you hit submit button, you want to pass on the keyword to the querystring of search results page
-    // when search page loads, take the value out of query string (keyword) then look in IndexedDb to display it
+  buildList: (movies) => {
+    //TO DO: build the list of cards inside the current page
   },
   /**************************************************/
 
