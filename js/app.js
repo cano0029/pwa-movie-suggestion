@@ -119,267 +119,266 @@ const APP = {
     document.getElementById('closeSearchBtn').addEventListener('click', APP.clearForm)
   },
 
-  // checkVersion () {
-  //   //check if the app was launched from installed version
-  //   if (navigator.standalone) {
-  //     // console.log('Launched: Installed (iOS)');
-  //     APP.isStandalone = true;
-  //   } else if (matchMedia('(display-mode: standalone)').matches) {
-  //     // console.log('Launched: Installed');
-  //     APP.isStandalone = true;
-  //   } else {
-  //     // console.log('Launched: Browser Tab');
-  //     APP.isStandalone = false;
-  //   }
-  // },
+  // // checkVersion () {
+  // //   //check if the app was launched from installed version
+  // //   if (navigator.standalone) {
+  // //     // console.log('Launched: Installed (iOS)');
+  // //     APP.isStandalone = true;
+  // //   } else if (matchMedia('(display-mode: standalone)').matches) {
+  // //     // console.log('Launched: Installed');
+  // //     APP.isStandalone = true;
+  // //   } else {
+  // //     // console.log('Launched: Browser Tab');
+  // //     APP.isStandalone = false;
+  // //   }
+  // // },
 
-  // sendMessage(msg, target) {
-  //   //TODO:
-  //   //send a message to the service worker
-  // },
+  // // sendMessage(msg, target) {
+  // //   //TODO:
+  // //   //send a message to the service worker
+  // // },
 
-  // onMessage({ data }) {
-  //   //TODO:
-  //   //message received from service worker
-  // },
+  // // onMessage({ data }) {
+  // //   //TODO:
+  // //   //message received from service worker
+  // // },
 
-  // startSearch(keyword) {
-  //   //TODO: check in IDB for movie results
-  //   if (keyword) {
-  //     //check the db
-  //     //if no matches make a fetch call to TMDB API
-  //     //or make the fetch call and intercept it in the SW
-  //     let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
+  // // startSearch(keyword) {
+  // //   //TODO: check in IDB for movie results
+  // //   if (keyword) {
+  // //     //check the db
+  // //     //if no matches make a fetch call to TMDB API
+  // //     //or make the fetch call and intercept it in the SW
+  // //     let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
 
-  //     APP.getData(url, (data) => {
-  //       //this is the CALLBACK to run after the fetch
-  //       APP.results = data.results;
-  //       APP.useSearchResults(keyword);
-  //     });
-  //   }
-  //   document.getElementById
-  // },
+  // //     APP.getData(url, (data) => {
+  // //       //this is the CALLBACK to run after the fetch
+  // //       APP.results = data.results;
+  // //       APP.useSearchResults(keyword);
+  // //     });
+  // //   }
+  // //   document.getElementById
+  // // },
 
-  // useSearchResults(keyword) {
-  //   //after getting fetch or db results
-  //   //display search keyword in pages title i.e. Showing search results for <keyword>
-  //   //then call buildList
-  //   let movies = APP.results;
-  //   let keywordSpan = document.querySelector('.ref-keyword');
-  //   if (keyword && keywordSpan) {
-  //     keywordSpan.textContent = keyword;
-  //   }
-  //   APP.buildList(movies);
-  // },
+  // // useSearchResults(keyword) {
+  // //   //after getting fetch or db results
+  // //   //display search keyword in pages title i.e. Showing search results for <keyword>
+  // //   //then call buildList
+  // //   let movies = APP.results;
+  // //   let keywordSpan = document.querySelector('.ref-keyword');
+  // //   if (keyword && keywordSpan) {
+  // //     keywordSpan.textContent = keyword;
+  // //   }
+  // //   APP.buildList(movies);
+  // // },
 
-  // startSuggest({ mid, ref }) {
-  //   //TODO: Do the search of IndexedDB for matches
-  //   //if no matches to a fetch call to TMDB API
-  //   //or make the fetch call and intercept it in the SW
+  // // startSuggest({ mid, ref }) {
+  // //   //TODO: Do the search of IndexedDB for matches
+  // //   //if no matches to a fetch call to TMDB API
+  // //   //or make the fetch call and intercept it in the SW
 
-  //   let url = `${APP.BASE_URL}movie/${mid}/similar?api_key=${APP.API_KEY}&ref=${ref}`;
-  //   //TODO: choose between /similar and /suggested endpoints from API
+  // //   let url = `${APP.BASE_URL}movie/${mid}/similar?api_key=${APP.API_KEY}&ref=${ref}`;
+  // //   //TODO: choose between /similar and /suggested endpoints from API
 
-  //   APP.getData(url, (data) => {
-  //     //this is the callback that will be used after fetch
-  //     APP.suggestedResults = data.results;
-  //     APP.useSuggestedResults(ref);
-  //   });
-  // },
+  // //   APP.getData(url, (data) => {
+  // //     //this is the callback that will be used after fetch
+  // //     APP.suggestedResults = data.results;
+  // //     APP.useSuggestedResults(ref);
+  // //   });
+  // // },
 
-  // useSuggestedResults(ref) {
-  //   //after getting fetch/db results
-  //   //display reference movie name in title
-  //   //then call buildList
-  //   let movies = APP.suggestedResults;
-  //   let titleSpan = document.querySelector('#suggested .ref-movie');
-  //   console.log('ref title', ref);
-  //   if (ref && titleSpan) {
-  //     titleSpan.textContent = ref;
-  //   }
-  //   APP.buildList(movies);
-  // },
+  // // useSuggestedResults(ref) {
+  // //   //after getting fetch/db results
+  // //   //display reference movie name in title
+  // //   //then call buildList
+  // //   let movies = APP.suggestedResults;
+  // //   let titleSpan = document.querySelector('#suggested .ref-movie');
+  // //   console.log('ref title', ref);
+  // //   if (ref && titleSpan) {
+  // //     titleSpan.textContent = ref;
+  // //   }
+  // //   APP.buildList(movies);
+  // // },
 
-  // getData: async (url, cb) => {
-  //   fetch(url)
-  //     .then((resp) => {
-  //       if (resp.ok) {
-  //         return resp.json();
-  //       } else {
-  //         let msg = resp.statusText;
-  //         throw new Error(`Could not fetch movies. ${msg}.`);
-  //       }
-  //     })
-  //     .then((data) => {
-  //       //callback
-  //       cb(data);
-  //     })
-  //     .catch((err) => {
-  //       console.warn(err);
-  //       cb({ code: err.code, message: err.message, results: [] });
-  //     });
-  // },
+  // // getData: async (url, cb) => {
+  // //   fetch(url)
+  // //     .then((resp) => {
+  // //       if (resp.ok) {
+  // //         return resp.json();
+  // //       } else {
+  // //         let msg = resp.statusText;
+  // //         throw new Error(`Could not fetch movies. ${msg}.`);
+  // //       }
+  // //     })
+  // //     .then((data) => {
+  // //       //callback
+  // //       cb(data);
+  // //     })
+  // //     .catch((err) => {
+  // //       console.warn(err);
+  // //       cb({ code: err.code, message: err.message, results: [] });
+  // //     });
+  // // },
 
-  // creating my movie database in indexedDB - using vanilla javascript
+  // // creating my movie database in indexedDB - using vanilla javascript
   
-  openDB() {
-    let dbOpenRequest = indexedDB.open('movieDB', APP.dbVersion) // second parameter is versioning
+  // openDB() {
+  //   let dbOpenRequest = indexedDB.open('movieDB', APP.dbVersion) // second parameter is versioning
 
-    dbOpenRequest.addEventListener('error', (error) => {
-      console.warn(error)
-    })
+  //   dbOpenRequest.addEventListener('error', (error) => {
+  //     console.warn(error)
+  //   })
 
-    // successfully loaded indexeddb database
-    dbOpenRequest.addEventListener('success', (event) => {
-      APP.db = event.target.result
-      console.log('success', APP.db)
-      // APP.buildList() // if you reload the page, data on the page is still there
-    })
+  //   // successfully loaded indexeddb database
+  //   dbOpenRequest.addEventListener('success', (event) => {
+  //     APP.db = event.target.result
+  //     console.log('success', APP.db)
+  //     // APP.buildList() // if you reload the page, data on the page is still there
+  //   })
 
-    // upgrading the indexeddb database i.e. creating data stores within your newly created database
-    dbOpenRequest.addEventListener('upgradeneeded', (event) => {
-      // creating/deleting stores can only be done in an 'upgradeneeded' event
-      // will get an error if you put it somewhere else i.e. success event
-      APP.db = event.target.result
-      console.log('upgrade', APP.db)
+  //   // upgrading the indexeddb database i.e. creating data stores within your newly created database
+  //   dbOpenRequest.addEventListener('upgradeneeded', (event) => {
+  //     // creating/deleting stores can only be done in an 'upgradeneeded' event
+  //     // will get an error if you put it somewhere else i.e. success event
+  //     APP.db = event.target.result
+  //     console.log('upgrade', APP.db)
 
-      // check to see which db version you are in
-      let oldVersion = event.oldVersion
-      let newVersion = event.newVersion || APP.db.version
-      console.log('DB updated from version', oldVersion, 'to', newVersion)
+  //     // check to see which db version you are in
+  //     let oldVersion = event.oldVersion
+  //     let newVersion = event.newVersion || APP.db.version
+  //     console.log('DB updated from version', oldVersion, 'to', newVersion)
       
-      // you have to check to see if store already exists
-      if( !APP.db.objectStoreNames.contains('movieStore' && 'suggestStore')) { 
-        // keyPath can be whatever you define it as, here I am doing keyword (entered in the form) and movie id - which we will use later
-        APP.moviedbStore = APP.db.createObjectStore('movieStore', { keyPath: 'keyword' })
-        APP.db.createObjectStore('suggestStore', { keyPath: 'id'})
-      }
-    })
-  },
+  //     // you have to check to see if store already exists
+  //     if( !APP.db.objectStoreNames.contains('movieStore' && 'suggestStore')) { 
+  //       // keyPath can be whatever you define it as, here I am doing keyword (entered in the form) and movie id - which we will use later
+  //       APP.moviedbStore = APP.db.createObjectStore('movieStore', { keyPath: 'keyword' })
+  //       APP.db.createObjectStore('suggestStore', { keyPath: 'id'})
+  //     }
+  //   })
+  // },
 
 
 
-  /***************************************************************** MY CODE */
-  // TO DO: merge with Steve's code
-  // TO DO: queryString, make searchResults and suggestMovies page show up
-  // NOTE: testing it on my searchResults page
-  // so far, I have successfully saved whatever it is I input in the search form i.e. keyword into movieStore in indexedDB
-  // I have also display it onto page as cards
-  // TO DO: BUT im not actually checking if it exists in indexedDB first and then display that
+  // /***************************************************************** MY CODE */
+  // // TO DO: merge with Steve's code
+  // // TO DO: queryString, make searchResults and suggestMovies page show up
+  // // NOTE: testing it on my searchResults page
+  // // so far, I have successfully saved whatever it is I input in the search form i.e. keyword into movieStore in indexedDB
+  // // I have also display it onto page as cards
+  // // TO DO: BUT im not actually checking if it exists in indexedDB first and then display that
   
-  async handleFormSubmit (keyword) {
-    // TO DO: move to getData function
-    // fetching the movie data
-    // event.preventDefault() 
-    // const keyword = event.target.search.value
+  // async handleFormSubmit (keyword) {
+  //   // TO DO: move to getData function
+  //   // fetching the movie data
+  //   // event.preventDefault() 
+  //   // const keyword = event.target.search.value
 
-    console.log('HANDLE FORMAT', keyword)
+  //   console.log('HANDLE FORMAT', keyword)
 
-    let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
-    const response = await fetch(url) 
+  //   let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
+  //   const response = await fetch(url) 
 
-    try {
-      if (!response.ok) throw new Error(response.message)
-        let movieResults = {
-          keyword: keyword, // TO DO: switch to ES6 modules in type script (package.json)
-          results: await response.json() // since it is in a promise, must await it - rejects it if I do it in another way
-        }
-      APP.saveMovies(movieResults)
-    } catch (err) {
-      console.warn(err)
-    }
-  },
+  //   try {
+  //     if (!response.ok) throw new Error(response.message)
+  //       let movieResults = {
+  //         keyword: keyword, // TO DO: switch to ES6 modules in type script (package.json)
+  //         results: await response.json() // since it is in a promise, must await it - rejects it if I do it in another way
+  //       }
+  //     APP.saveMovies(movieResults)
+  //   } catch (err) {
+  //     console.warn(err)
+  //   }
+  // },
 
-  saveMovies (movieResults) {
-    // saving movie results data into indexedDB - movieStores
-    let transaction = APP.makeTransaction('movieStore', 'readwrite');
-    transaction.oncomplete = (ev) => {
-      console.log('ONCOMPLETE', ev)
-      APP.buildList(movieResults) 
-      APP.clearForm()
-    };
+  // saveMovies (movieResults) {
+  //   // saving movie results data into indexedDB - movieStores
+  //   let transaction = APP.makeTransaction('movieStore', 'readwrite');
+  //   transaction.oncomplete = (ev) => {
+  //     console.log('ONCOMPLETE', ev)
+  //     APP.buildList(movieResults) 
+  //     APP.clearForm()
+  //   };
 
-    let store = transaction.objectStore('movieStore');
-    let request = store.add(movieResults); // adds new object into movieStore in indexedDB
+  //   let store = transaction.objectStore('movieStore');
+  //   let request = store.add(movieResults); // adds new object into movieStore in indexedDB
 
-    request.onsuccess = (ev) => {
-      console.log('successfully added an object', ev); // that the add request is a success
-    };
-    request.onerror = (error) => {
-      console.log('error in request to add', error);
-    };
-  },
+  //   request.onsuccess = (ev) => {
+  //     console.log('successfully added an object', ev); // that the add request is a success
+  //   };
+  //   request.onerror = (error) => {
+  //     console.log('error in request to add', error);
+  //   };
+  // },
 
-  makeTransaction (storeName, mode) {
-    let transaction = APP.db.transaction(storeName, mode)
-    transaction.onerror = (error) => {
-      console.log(error)
-    }
-    return transaction
-  },
+  // makeTransaction (storeName, mode) {
+  //   let transaction = APP.db.transaction(storeName, mode)
+  //   transaction.onerror = (error) => {
+  //     console.log(error)
+  //   }
+  //   return transaction
+  // },
 
-  buildList: (movieResults) => {
-    let container = document.querySelector('.movies')
-    container.innerHTML = ``
+  // buildList: (movieResults) => {
+  //   let container = document.querySelector('.movies')
+  //   container.innerHTML = ``
 
-    let transaction = APP.makeTransaction('movieStore', 'readonly')
-    transaction.oncomplete = (event) => {
-      // transaction for reading all objs is complete
-      console.log(event)
-    }
-    let store = transaction.objectStore('movieStore')
-    let getRequest = store.getAll() //returns an array
-    console.log('This is what you are getting', getRequest)
+  //   let transaction = APP.makeTransaction('movieStore', 'readonly')
+  //   transaction.oncomplete = (event) => {
+  //     // transaction for reading all objs is complete
+  //     console.log(event)
+  //   }
+  //   let store = transaction.objectStore('movieStore')
+  //   let getRequest = store.getAll() //returns an array
+  //   console.log('This is what you are getting', getRequest)
     
-    getRequest.onsuccess = (event) => {
-      // getAll was successful
-      let request = event.target // request === getRequest === event.target
-      console.log({request})
-      console.log('HELLLLO', movieResults)
+  //   getRequest.onsuccess = (event) => {
+  //     // getAll was successful
+  //     let request = event.target // request === getRequest === event.target
+  //     console.log({request})
+  //     console.log('HELLLLO', movieResults)
 
-      // TO DO: check db first and return those results instead of fetching if they exist
-      // I'm not actually going into my indexedDB and returning a previously saved data
-      // Im just going to TMDB fetch results and displaying that
-      let searchData = movieResults.results // info from fetch
-      container.innerHTML = searchData.results // under results
-      .map( movie => {
-        let img = './img/icon-512x512.png';
-        if (movie.poster_path != null) {
-          img = APP.imgURL + 'w500/' + movie.poster_path;
-        } else {
-          img = APP.noImgUrl
-        }
-        return `<div class="card hoverable large" data-id="${movie.id}">
-        <div class="card-image">
-          <img src="${img}" alt="movie poster" class="notmaterialboxed"/>
-          </div>
-        <div class="card-content activator">
-          <h3 class="card-title"><span>${movie.title}</span><i class="material-icons right">more_vert</i></h3>
-        </div>
-        <div class="card-reveal">
-          <span class="card-title grey-text text-darken-4">${movie.title}<i class="material-icons right">close</i></span>
-          <h6>${movie.release_date}</h6>
-          <p>${movie.overview}</p>
-        </div>
-        <div class="card-action">
-          <a href="#" class="find-suggested light-blue-text text-darken-3">Show Similar<i class="material-icons right">search</i></a>
-        </div>
-      </div>`
-      }).join('\n') // array of html that will be joined together
-    }
-    getRequest.onerror = (error) => {
-      console.warn(error)
-    }
-  },
+  //     // TO DO: check db first and return those results instead of fetching if they exist
+  //     // I'm not actually going into my indexedDB and returning a previously saved data
+  //     // Im just going to TMDB fetch results and displaying that
+  //     let searchData = movieResults.results // info from fetch
+  //     container.innerHTML = searchData.results // under results
+  //     .map( movie => {
+  //       let img = './img/icon-512x512.png';
+  //       if (movie.poster_path != null) {
+  //         img = APP.imgURL + 'w500/' + movie.poster_path;
+  //       } else {
+  //         img = APP.noImgUrl
+  //       }
+  //       return `<div class="card hoverable large" data-id="${movie.id}">
+  //       <div class="card-image">
+  //         <img src="${img}" alt="movie poster" class="notmaterialboxed"/>
+  //         </div>
+  //       <div class="card-content activator">
+  //         <h3 class="card-title"><span>${movie.title}</span><i class="material-icons right">more_vert</i></h3>
+  //       </div>
+  //       <div class="card-reveal">
+  //         <span class="card-title grey-text text-darken-4">${movie.title}<i class="material-icons right">close</i></span>
+  //         <h6>${movie.release_date}</h6>
+  //         <p>${movie.overview}</p>
+  //       </div>
+  //       <div class="card-action">
+  //         <a href="#" class="find-suggested light-blue-text text-darken-3">Show Similar<i class="material-icons right">search</i></a>
+  //       </div>
+  //     </div>`
+  //     }).join('\n') // array of html that will be joined together
+  //   }
+  //   getRequest.onerror = (error) => {
+  //     console.warn(error)
+  //   }
+  // },
 
-  clearForm (event) {
-    // clears the form 
-    if (event) event.preventDefault() // prevents the page from reloading
-    document.getElementById('searchForm').reset() 
+  // clearForm (event) {
+  //   // clears the form 
+  //   if (event) event.preventDefault() // prevents the page from reloading
+  //   document.getElementById('searchForm').reset() 
+  // }
+  // /**************************************************/
   }
-  /**************************************************/
-
-}
 
 document.addEventListener('DOMContentLoaded', APP.init)
 
