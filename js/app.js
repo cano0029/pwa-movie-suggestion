@@ -64,10 +64,22 @@ const APP = {
     APP.checkVersion()
   },
 
+  // from eventListener of form submit
+  createQueryStr(event) {
+    // TO DO: pass on search keyword from home to query string of searchResults.html
+    // do i have to trim the keyword? What if user types in spaces in their keywords? - handle this
+    event.preventDefault() 
+    const keyword = event.target.search.value // whatever the value is inputted in the form
+    console.log('The keyword you entered is:', keyword)
+    // const queryString = `keyword=${keyword}`
+    window.location.href = `/pages/searchResults.html?keyword=${keyword}`
+    //APP.pageLoaded(keyword)
+  },
+
   pageLoaded() {
     //page has just loaded and we need to check the queryString
     //based on the querystring value(s) run the page specific tasks
-    // console.log('page loaded and checking', location.search);
+    console.log('page loaded and checking', location.search);
     let params = new URL(document.location).searchParams;
     let keyword = params.get('keyword');
     if (keyword) {
@@ -75,6 +87,8 @@ const APP = {
       console.log(`on searchResults.html - startSearch(${keyword})`);
       APP.startSearch(keyword);
     }
+
+    // TO DO: pass on movie id to query string of suggestedMovies.html
     let mid = parseInt(params.get('movie_id'));
     let ref = params.get('ref');
     if (mid && ref) {
@@ -87,6 +101,9 @@ const APP = {
   addListeners() {
     //TODO:
     //listen for on and off line events
+    // am i already doing this in service worker??
+    // if online- preload or reload?
+    // if offline - offline page
 
     //TODO:
     //listen for Chrome install prompt
@@ -97,9 +114,8 @@ const APP = {
       console.log('app was installed');
     });
 
-    // TO DO: delete this, just a test to see of I'm getting anything from movieDB!
     // listen for submit of the search form in home.html
-    document.getElementById('searchForm').addEventListener('submit', APP.handleFormSubmit)
+    document.getElementById('searchForm').addEventListener('submit', APP.createQueryStr)
     document.getElementById('closeSearchBtn').addEventListener('click', APP.clearForm)
   },
 
@@ -261,12 +277,9 @@ const APP = {
   // I have also display it onto page as cards
   // TO DO: BUT im not actually checking if it exists in indexedDB first and then display that
   
-  async handleFormSubmit (event) {
+  async handleFormSubmit (keyword) {
     // TO DO: move to getData function
     // fetching the movie data
-    event.preventDefault() 
-    const keyword = event.target.search.value // whatever the value is inputted in the form
-    console.log('The keyword you entered is:', keyword)
 
     let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
     const response = await fetch(url) 
@@ -328,6 +341,7 @@ const APP = {
     }
     let store = transaction.objectStore('movieStore')
     let getRequest = store.getAll() //returns an array
+    console.log('This is what you are getting', getRequest)
     
     getRequest.onsuccess = (event) => {
       // getAll was successful
