@@ -70,9 +70,8 @@ self.addEventListener('activate', event => {
   console.log('Service worker has been activated')
 })
 
-// create and return dynamic cache
+// create and return dynamic cache if offline
 self.addEventListener('fetch', event => {
-  // if request is inside our cache, return it from our cache- better offline experience
   event.respondWith(
     (async () => {
       const cachedResponse = await caches.match(event.request)
@@ -83,22 +82,18 @@ self.addEventListener('fetch', event => {
       try{
         const networkResponse = await fetch(event.request)
         dynamicCache.put(event.request, networkResponse.clone())
-        // TO DO: control which assets go into dynamic cache here - suggest and movie results html as well as their images
-        // right now it is storing everything that is not already in static cache
         maxCacheSize(DYNAMIC_CACHE, 45)
         return networkResponse
       } catch(error) {
         const requestedPage = event.request.url.indexOf('.html')
-        // TO DO: change code use OFFLINE)URL
         if(requestedPage > -1) { // it will only show offline page if user is trying to go to a page (not when it is trying to load an image etc.)
-          return caches.match('/pages/404.html')
+          return caches.match(OFFLINE_URL)
         } 
       }
     })()
   )
 })
 
-// TO DO: need to fix - maybe merge it with function that is creating dynamic cache
 self.addEventListener("fetch", (event) => {
   if (event.request.mode === "navigate") {
     // only want to respond with our offline if browser or user is trying to do something in a NEW page, not in the current page
@@ -111,17 +106,11 @@ self.addEventListener("fetch", (event) => {
           }
 
           // if it was not pre-fetch, try the network
-          // Always try the network 
           const networkResponse = await fetch(event.request);
           return networkResponse; // if yes, return that page
 
         } catch (error) {
-          // catch is only triggered if an exception is thrown, which is likely
-          // due to a network error.
-          // If fetch() returns a valid HTTP response with a response code in
-          // the 4xx or 5xx range, the catch() will NOT be called.
           console.log("Fetch failed; returning offline page instead.", error);
-
           // if error, return that cached page during initialize
           const cache = await caches.open(STATIC_CACHE);
           const cachedResponse = await cache.match(OFFLINE_URL);
@@ -130,12 +119,6 @@ self.addEventListener("fetch", (event) => {
       })()
     );
   }
-
-  // If our if() condition is false, then this fetch handler won't intercept the
-  // request. If there are any other fetch handlers registered, they will get a
-  // chance to call event.respondWith(). If no fetch handlers call
-  // event.respondWith(), the request will be handled by the browser as if there
-  // were no service worker involvement.
 });
 
 // TO DO: what is this??
