@@ -60,31 +60,54 @@ const APP = {
 
     APP.openDB()
     APP.addListeners()
-    APP.pageLoaded()
     APP.checkVersion()
   },
 
+  pageLoaded() {
+    console.log('page loaded and checking', location.search)
+    let params = new URL(document.location).searchParams;
+    let keyword = params.get('keyword');
+    console.log('HERE IS YOUR KEYWORD FROM QUERYSTRING', keyword)
+    
+    if (keyword) {
+      //means we are on results.html
+      APP.checkMovieStore(keyword)
+      console.log(`on searchResults.html - startSearch(${keyword})`);
+    }
+
+  //   let mid = parseInt(params.get('movie_id'));
+  //   let ref = params.get('ref');
+  //   if (mid && ref) {
+  //     //we are on suggest.html
+  //     console.log(`look in db for movie_id ${mid} or do fetch`);
+  //     APP.startSuggest({ mid, ref });
+  //   }
+  },
+
   async handleFormSubmit(event) {
-    // TO DO: pass on search keyword from home to query string of searchResults.html
-    // do i have to trim the keyword? What if user types in spaces in their keywords? - handle this
-    event.preventDefault() 
-    const searchInput = await event.target.search.value // whatever the value is inputted in the form
-    const keyword = searchInput.trim()
-    APP.checkMovieStore(keyword)
     // TO DO: reloads each time and I lose my buildList
     // build query string and go to results page
-    if (keyword){
-      let base = location.origin
-      let url = new URL('/pages/searchResults.html', base) // creating a new URL each time - so it will reload
-      url.search = '?keyword=' + encodeURIComponent(keyword)
-      // location.href = url
+    event.preventDefault()
+    const searchInput = await event.target.search.value // whatever the value is inputted in the form
+    const keyword = searchInput.trim() 
 
-      // TO DO: from index.html - open searchResults html AND then do history.pushState
+      if (keyword){
+        event.preventDefault()
+        let base = location.origin
+        let url = new URL('/pages/searchResults.html', base) // creating a new URL each time - so it will reload
+        url.search = '?keyword=' + encodeURIComponent(keyword)
+        // location.href = `/pages/searchResults.html?keyword=${keyword}` 
+        location.href = url // reloads it way too fast  
+        
 
-      // this prevents page from reloading but still changing queryString
-      history.pushState({}, '', url)
+        // this prevents page from reloading but still changing queryString
+        history.pushState({}, '', url) 
+
+        APP.clearForm()
     }
-    // location.href = `/pages/searchResults.html?keyword=${keyword}` 
+
+    
+    
     console.log('The keyword you entered is:', keyword)
     
   },
@@ -191,26 +214,6 @@ const APP = {
     return transaction
   },
 
-  pageLoaded() {
-    console.log('page loaded and checking', location.search)
-    let params = new URL(document.location).searchParams;
-    let keyword = params.get('keyword');
-    console.log('HERE IS YOUR KEYWORD FROM QUERYSTRING', keyword)
-    if (keyword) {
-      //means we are on results.html
-      console.log(`on searchResults.html - startSearch(${keyword})`);
-      // APP.startSearch(keyword);
-    }
-
-  //   let mid = parseInt(params.get('movie_id'));
-  //   let ref = params.get('ref');
-  //   if (mid && ref) {
-  //     //we are on suggest.html
-  //     console.log(`look in db for movie_id ${mid} or do fetch`);
-  //     APP.startSuggest({ mid, ref });
-  //   }
-  },
-
   addListeners() {
     //TODO:
     //listen for on and off line events
@@ -265,6 +268,7 @@ const APP = {
     dbOpenRequest.addEventListener('success', (event) => {
       APP.db = event.target.result
       console.log('success', APP.db)
+      APP.pageLoaded()
     })
     
     //error listener
@@ -272,6 +276,12 @@ const APP = {
       console.warn(error)
     })
   },
+
+  clearForm (event) {
+    // clears the form 
+    if (event) event.preventDefault() // prevents the page from reloading
+    document.getElementById('searchForm').reset() 
+  }
   
   }
 
