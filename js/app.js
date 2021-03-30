@@ -69,16 +69,64 @@ const APP = {
     // do i have to trim the keyword? What if user types in spaces in their keywords? - handle this
     event.preventDefault() 
     const keyword = await event.target.search.value // whatever the value is inputted in the form
-    window.location.href = `/pages/searchResults.html?keyword=${keyword}` 
+    // window.location.href = `/pages/searchResults.html?keyword=${keyword}` 
     console.log('The keyword you entered is:', keyword)
     APP.checkDB(keyword)
   },
 
-  checkDB (keyword) {
+  async checkDB (keyword) {
     // first check if keyword exists in db else fetch
-    const item = APP.makeTransaction('movieStore','readwrite').objectStore('movieStore').get(keyword)
     
-    APP.getData(keyword)
+    let transaction = await APP.makeTransaction('movieStore', 'readonly')
+    transaction.oncomplete = (event) => {
+      // transaction for reading all objs is complete
+      console.log('Successfully found it in db',event)
+    }
+    let store = transaction.objectStore('movieStore')
+    let getRequest = await store.getAll(keyword) //returns an array
+
+    getRequest.onsuccess = (event) => {
+      // getAll was successful
+      let request = event.target.result
+      console.log('I exist', request)
+      return APP.buildList(request)
+    }
+    
+      APP.getData(keyword)
+  },
+
+  buildList(request) {
+    // if it exists in db
+    let movieResults = request[0].results
+    console.log(movieResults.results)
+
+    let container = document.querySelector('.movies')
+    container.innerHTML = movieResults.results
+    .map ( movie => {
+      let img = './img/icon-512x512.png';
+      if (movie.poster_path != null) {
+        img = APP.imgURL + 'w500/' + movie.poster_path;
+      } else {
+        img = APP.noImgUrl
+      }
+
+      return `<div class="card hoverable large" data-id="${movie.id}">
+      <div class="card-image">
+        <img src="${img}" alt="movie poster" class="notmaterialboxed"/>
+        </div>
+      <div class="card-content activator">
+        <h3 class="card-title"><span>${movie.title}</span><i class="material-icons right">more_vert</i></h3>
+      </div>
+      <div class="card-reveal">
+        <span class="card-title grey-text text-darken-4">${movie.title}<i class="material-icons right">close</i></span>
+        <h6>${movie.release_date}</h6>
+        <p>${movie.overview}</p>
+      </div>
+      <div class="card-action">
+        <a href="#" class="find-suggested light-blue-text text-darken-3">Show Similar<i class="material-icons right">search</i></a>
+      </div>
+    </div>`
+    }).join('\n') // array of html that will be joined together
   },
 
   async getData (keyword){
@@ -102,7 +150,6 @@ const APP = {
     transaction.oncomplete = (ev) => {
       console.log('ONCOMPLETE', ev)
       // APP.buildList(movieResults) 
-      APP.clearForm()
     }
 
     let store = transaction.objectStore('movieStore')
@@ -158,7 +205,6 @@ const APP = {
 
     // listen for submit of the search form in home.html
     document.getElementById('searchForm').addEventListener('submit', APP.handleFormSubmit)
-    document.getElementById('closeSearchBtn').addEventListener('click', APP.clearForm)
   },
 
   checkVersion () {
@@ -206,6 +252,7 @@ const APP = {
       console.warn(error)
     })
   },
+  
   }
 
 document.addEventListener('DOMContentLoaded', APP.init)

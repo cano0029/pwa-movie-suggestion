@@ -1,6 +1,6 @@
 
-const DYNAMIC_CACHE = "dynamic-v3"
-const STATIC_CACHE = "static-v3"
+const DYNAMIC_CACHE = "dynamic-v2"
+const STATIC_CACHE = "static-v2"
 const OFFLINE_URL = '/pages/404.html'
 
 const STATIC_ASSETS = [
