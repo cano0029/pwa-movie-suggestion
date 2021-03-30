@@ -70,18 +70,23 @@ const APP = {
     event.preventDefault() 
     const searchInput = await event.target.search.value // whatever the value is inputted in the form
     const keyword = searchInput.trim()
-
+    APP.checkMovieStore(keyword)
     // TO DO: reloads each time and I lose my buildList
     // build query string and go to results page
-    // if (keyword){
-    //   let base = location.origin
-    //   let url = new URL('/pages/searchResults.html', base)
-    //   url.search = '?keyword=' + encodeURIComponent(keyword)
-    //   location.href = url
-    // }
+    if (keyword){
+      let base = location.origin
+      let url = new URL('/pages/searchResults.html', base) // creating a new URL each time - so it will reload
+      url.search = '?keyword=' + encodeURIComponent(keyword)
+      // location.href = url
+
+      // TO DO: from index.html - open searchResults html AND then do history.pushState
+
+      // this prevents page from reloading but still changing queryString
+      history.pushState({}, '', url)
+    }
     // location.href = `/pages/searchResults.html?keyword=${keyword}` 
     console.log('The keyword you entered is:', keyword)
-    APP.checkMovieStore(keyword)
+    
   },
 
   async checkMovieStore (keyword) {
