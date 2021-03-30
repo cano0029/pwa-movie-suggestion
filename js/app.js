@@ -26,7 +26,6 @@ const APP = {
   moviedbStore: null,
   dbVersion: 2,
 
-  isOnline: 'onLine' in navigator && navigator.onLine,
   isStandalone: false,
 
   init(){
@@ -43,7 +42,7 @@ const APP = {
 
     APP.openDB()
     APP.addListeners()
-    APP.checkVersion()
+    APP.checkInstall()
   }, 
   
   addListeners() {
@@ -88,7 +87,7 @@ const APP = {
     }
   },
 
-  checkVersion () {
+  checkInstall () {
     if (navigator.standalone) {
       console.log('Launched: Installed (iOS)');
       APP.isStandalone = true;
@@ -102,8 +101,6 @@ const APP = {
   }, 
   
   async handleFormSubmit(event) {
-    // TO DO: reloads each time and I lose my buildList
-    // build query string and go to results page
     event.preventDefault()
     const searchInput = await event.target.search.value // whatever the value is inputted in the form
     const keyword = searchInput.trim() 
@@ -113,20 +110,9 @@ const APP = {
         let base = location.origin
         let url = new URL('/pages/searchResults.html', base) // creating a new URL each time - so it will reload
         url.search = '?keyword=' + encodeURIComponent(keyword)
-        // location.href = `/pages/searchResults.html?keyword=${keyword}` 
-        location.href = url // reloads it way too fast  
-        
-
-        // this prevents page from reloading but still changing queryString
-        history.pushState({}, '', url) 
-
+        location.href = url  
         APP.clearForm()
     }
-
-    
-    
-    console.log('The keyword you entered is:', keyword)
-    
   },
 
   pageLoaded() {
@@ -217,27 +203,7 @@ const APP = {
           console.warn('Could not fetch movies', error)
         }
   },
-
-  saveResults (movieResults) {
-    let transaction = APP.makeTransaction('movieStore', 'readwrite')
-    transaction.oncomplete = (ev) => {
-      console.log('ONCOMPLETE', ev)
-      let movies = movieResults.results
-      APP.buildList(movies) 
-    }
-
-    let store = transaction.objectStore('movieStore')
-    let request = store.add(movieResults)
-
-
-    request.onsuccess = (ev) => {
-      console.log('successfully added an object', ev) // that the add request is a success
-    }
-    request.onerror = (error) => {
-      console.log('error in request to add', error)
-    }
-  },
-
+  
   async getSuggest({ id, ref }) {
     //TODO: Do the search of IndexedDB for matches
     //if no matches to a fetch call to TMDB API
@@ -261,6 +227,26 @@ const APP = {
       } catch (error) {
         console.warn('Could not fetch movies', error)
       }
+  },
+
+  saveResults (movieResults) {
+    let transaction = APP.makeTransaction('movieStore', 'readwrite')
+    transaction.oncomplete = (ev) => {
+      console.log('ONCOMPLETE', ev)
+      let movies = movieResults.results
+      APP.buildList(movies) 
+    }
+
+    let store = transaction.objectStore('movieStore')
+    let request = store.add(movieResults)
+
+
+    request.onsuccess = (ev) => {
+      console.log('successfully added an object', ev) // that the add request is a success
+    }
+    request.onerror = (error) => {
+      console.log('error in request to add', error)
+    }
   },
 
   saveSuggest(suggestResults) {
@@ -330,39 +316,6 @@ const APP = {
     </div>`
     }).join('\n') // array of html that will be joined together
   },
-
-  // buildAnotherList(movieResults) {
-  //   console.log('I AM TRYING TO BUILD YOU', movieResults.results)
-  //   let fetched = movieResults.results
-
-  //   let container = document.querySelector('.movies')
-  //   container.innerHTML = fetched.results
-  //   .map ( movie => {
-  //     let img = './img/icon-512x512.png';
-  //     if (movie.poster_path != null) {
-  //       img = APP.imgURL + 'w500/' + movie.poster_path;
-  //     } else {
-  //       img = APP.noImgUrl
-  //     }
-
-  //     return `<div class="card hoverable large" data-id="${movie.id}">
-  //     <div class="card-image">
-  //       <img src="${img}" alt="movie poster" class="notmaterialboxed"/>
-  //       </div>
-  //     <div class="card-content activator">
-  //       <h3 class="card-title"><span>${movie.title}</span><i class="material-icons right">more_vert</i></h3>
-  //     </div>
-  //     <div class="card-reveal">
-  //       <span class="card-title grey-text text-darken-4">${movie.title}<i class="material-icons right">close</i></span>
-  //       <h6>${movie.release_date}</h6>
-  //       <p>${movie.overview}</p>
-  //     </div>
-  //     <div class="card-action">
-  //       <a href="#" class="find-suggested light-blue-text text-darken-3">Show Similar<i class="material-icons right">search</i></a>
-  //     </div>
-  //   </div>`
-  //   }).join('\n') // array of html that will be joined together
-  // },
 
   makeTransaction (storeName, mode) {
     let transaction = APP.db.transaction(storeName, mode)
