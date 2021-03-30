@@ -61,6 +61,35 @@ const APP = {
     APP.openDB()
     APP.addListeners()
     APP.checkVersion()
+  }, 
+  
+  addListeners() {
+    //TODO:
+    //listen for on and off line events
+
+    //TODO:
+    //listen for Chrome install prompt- handle the deferredPrompt
+
+    //listen for sign that app was installed
+    window.addEventListener('appinstalled', (evt) => {
+      console.log('app was installed');
+    });
+
+    // listen for submit of the search form in home.html
+    document.getElementById('searchForm').addEventListener('submit', APP.handleFormSubmit)
+  },
+
+  checkVersion () {
+    if (navigator.standalone) {
+      console.log('Launched: Installed (iOS)');
+      APP.isStandalone = true;
+    } else if (matchMedia('(display-mode: standalone)').matches) {
+      console.log('Launched: Installed');
+      APP.isStandalone = true;
+    } else {
+      console.log('Launched: Browser Tab');
+      APP.isStandalone = false;
+    }
   },
 
   pageLoaded() {
@@ -127,14 +156,64 @@ const APP = {
       // getAll was successful
       let request = event.target.result
       console.log('I exist', request)
-      return APP.buildList(request)
+      if (request.length === 0) {
+        APP.getData(keyword)
+      } else {
+        APP.buildList(request)
+      }  
     }
-    
-      APP.getData(keyword)
+  },
+  
+  async getData (keyword){
+      let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
+      const response = await fetch(url) 
+
+      let keywordSpan = document.querySelector('.ref-keyword');
+      if (keyword && keywordSpan) {
+        keywordSpan.textContent = keyword;
+      }
+
+      try {
+        if (!response.ok) throw new Error(response.message)
+          let movieResults = {
+            keyword: keyword, // TO DO: switch to ES6 modules in type script (package.json)
+            results: await response.json()
+          }
+          return APP.saveResults(movieResults)
+        } catch (error) {
+          console.warn('Could not fetch movies', error)
+        }
+  },
+
+  saveResults (movieResults) {
+    let transaction = APP.makeTransaction('movieStore', 'readwrite')
+    transaction.oncomplete = (ev) => {
+      console.log('ONCOMPLETE', ev)
+      APP.buildAnotherList(movieResults) 
+    }
+
+    let store = transaction.objectStore('movieStore')
+    let request = store.add(movieResults)
+
+
+    request.onsuccess = (ev) => {
+      console.log('successfully added an object', ev) // that the add request is a success
+    }
+    request.onerror = (error) => {
+      console.log('error in request to add', error)
+    }
   },
 
   buildList(request) {
-    // if it exists in db
+    // change title results
+    let params = new URL(document.location).searchParams;
+    let keyword = params.get('keyword');
+
+    let keywordSpan = document.querySelector('.ref-keyword');
+      if (keyword && keywordSpan) {
+        keywordSpan.textContent = keyword;
+      }
+
     let movieResults = request[0].results
     console.log(movieResults.results)
 
@@ -167,43 +246,37 @@ const APP = {
     }).join('\n') // array of html that will be joined together
   },
 
-  async getData (keyword){
-    let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
-    const response = await fetch(url) 
+  buildAnotherList(movieResults) {
+    console.log('I AM TRYING TO BUILD YOU', movieResults.results)
+    let fetched = movieResults.results
 
-    let keywordSpan = document.querySelector('.ref-keyword');
-    if (keyword && keywordSpan) {
-      keywordSpan.textContent = keyword;
-    }
-
-    try {
-      if (!response.ok) throw new Error(response.message)
-        let movieResults = {
-          keyword: keyword, // TO DO: switch to ES6 modules in type script (package.json)
-          results: await response.json()
-        }
-        return APP.saveResults(movieResults)
-      } catch (error) {
-        console.warn('Could not fetch movies', error)
+    let container = document.querySelector('.movies')
+    container.innerHTML = fetched.results
+    .map ( movie => {
+      let img = './img/icon-512x512.png';
+      if (movie.poster_path != null) {
+        img = APP.imgURL + 'w500/' + movie.poster_path;
+      } else {
+        img = APP.noImgUrl
       }
-  },
 
-  saveResults (movieResults) {
-    let transaction = APP.makeTransaction('movieStore', 'readwrite')
-    transaction.oncomplete = (ev) => {
-      console.log('ONCOMPLETE', ev)
-      // APP.buildList(movieResults) 
-    }
-
-    let store = transaction.objectStore('movieStore')
-    let request = store.add(movieResults)
-
-    request.onsuccess = (ev) => {
-      console.log('successfully added an object', ev) // that the add request is a success
-    }
-    request.onerror = (error) => {
-      console.log('error in request to add', error)
-    }
+      return `<div class="card hoverable large" data-id="${movie.id}">
+      <div class="card-image">
+        <img src="${img}" alt="movie poster" class="notmaterialboxed"/>
+        </div>
+      <div class="card-content activator">
+        <h3 class="card-title"><span>${movie.title}</span><i class="material-icons right">more_vert</i></h3>
+      </div>
+      <div class="card-reveal">
+        <span class="card-title grey-text text-darken-4">${movie.title}<i class="material-icons right">close</i></span>
+        <h6>${movie.release_date}</h6>
+        <p>${movie.overview}</p>
+      </div>
+      <div class="card-action">
+        <a href="#" class="find-suggested light-blue-text text-darken-3">Show Similar<i class="material-icons right">search</i></a>
+      </div>
+    </div>`
+    }).join('\n') // array of html that will be joined together
   },
 
   makeTransaction (storeName, mode) {
@@ -212,35 +285,6 @@ const APP = {
       console.log(error)
     }
     return transaction
-  },
-
-  addListeners() {
-    //TODO:
-    //listen for on and off line events
-
-    //TODO:
-    //listen for Chrome install prompt- handle the deferredPrompt
-
-    //listen for sign that app was installed
-    window.addEventListener('appinstalled', (evt) => {
-      console.log('app was installed');
-    });
-
-    // listen for submit of the search form in home.html
-    document.getElementById('searchForm').addEventListener('submit', APP.handleFormSubmit)
-  },
-
-  checkVersion () {
-    if (navigator.standalone) {
-      console.log('Launched: Installed (iOS)');
-      APP.isStandalone = true;
-    } else if (matchMedia('(display-mode: standalone)').matches) {
-      console.log('Launched: Installed');
-      APP.isStandalone = true;
-    } else {
-      console.log('Launched: Browser Tab');
-      APP.isStandalone = false;
-    }
   },
 
   openDB() {
