@@ -77,6 +77,26 @@ const APP = {
 
     // listen for submit of the search form in home.html
     document.getElementById('searchForm').addEventListener('submit', APP.handleFormSubmit)
+
+    // movie div is clicked
+    let movies = document.querySelector('.movies')
+    if (movies) {
+      //navigate to the suggested page
+      //build the queryString with movie id and ref title
+      movies.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        let anchor = ev.target;
+        if (anchor.tagName === 'A') {
+          let card = anchor.closest('.card');
+          let title = card.querySelector('.card-title span').textContent;
+          let mid = card.getAttribute('data-id');
+          let base = location.origin;
+          let url = new URL('/pages/suggestedMovies.html', base);
+          url.search = `?movie_id=${mid}&ref=${encodeURIComponent(title)}`;
+          location.href = url;
+        }
+      })
+    }
   },
 
   checkVersion () {
