@@ -66,13 +66,20 @@ const APP = {
   addListeners() {
     //TODO:
     //listen for on and off line events
+    window.addEventListener('online', (event) => {
+      console.log('Connection back online', event)
+    })
+
+    window.addEventListener('offline', (event) => {
+      console.log('Connection lost. Offline.', event)
+    })
 
     //TODO:
     //listen for Chrome install prompt- handle the deferredPrompt
 
     //listen for sign that app was installed
-    window.addEventListener('appinstalled', (evt) => {
-      console.log('app was installed');
+    window.addEventListener('appinstalled', (event) => {
+      console.log('app was installed', event);
     });
 
     // listen for submit of the search form in home.html
@@ -98,6 +105,10 @@ const APP = {
       })
     }
   },
+
+  navigateSuggestPage (event) {
+    event.preventDefault()
+  }
 
   checkVersion () {
     if (navigator.standalone) {
@@ -301,7 +312,7 @@ const APP = {
 
     let searchQuery = new URL(document.location).searchParams
     let ref = searchQuery.get('ref')
-    
+
     let suggestSpan = document.querySelector('.ref-keyword');
       if (ref && suggestSpan) {
         suggestSpan.textContent = ref;

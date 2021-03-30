@@ -27,7 +27,6 @@ const STATIC_ASSETS = [
 
 const DYNAMIC_ASSETS = []
 
-//limit dynamic cache size 
 const maxCacheSize = (cacheName, maxSize) => {
   caches.open(cacheName)
   .then(cache => { cache.keys()
@@ -72,7 +71,6 @@ self.addEventListener('activate', event => {
 })
 
 // create and return dynamic cache
-// TO DO: control which htmls and resources (images) go into dynamic assets []
 self.addEventListener('fetch', event => {
   // if request is inside our cache, return it from our cache- better offline experience
   event.respondWith(
@@ -142,7 +140,7 @@ self.addEventListener("fetch", (event) => {
 
 // TO DO: what is this??
 self.addEventListener('message', ({ data }) => {
-  //message received from a web page that uses this sw
+  console.log('Message', data)
 });
 
 const sendMessage = async (msg) => {
