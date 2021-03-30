@@ -124,13 +124,13 @@ const APP = {
       console.log(`on searchResults.html - startSearch(${keyword})`);
     }
 
-  //   let mid = parseInt(params.get('movie_id'));
-  //   let ref = params.get('ref');
-  //   if (mid && ref) {
-  //     //we are on suggest.html
-  //     console.log(`look in db for movie_id ${mid} or do fetch`);
-  //     APP.startSuggest({ mid, ref });
-  //   }
+    let id = parseInt(params.get('movie_id'));
+    let ref = params.get('ref');
+    if (id && ref) {
+      //we are on suggest.html
+      console.log(`look in db for movie_id ${id} or do fetch`);
+      APP.getSuggest({ id, ref });
+    }
   },
 
   async handleFormSubmit(event) {
@@ -218,6 +218,49 @@ const APP = {
 
     request.onsuccess = (ev) => {
       console.log('successfully added an object', ev) // that the add request is a success
+    }
+    request.onerror = (error) => {
+      console.log('error in request to add', error)
+    }
+  },
+
+  async getSuggest({ id, ref }) {
+    //TODO: Do the search of IndexedDB for matches
+    //if no matches to a fetch call to TMDB API
+    //or make the fetch call and intercept it in the SW
+    let url = `${APP.baseURL}movie/${id}/similar?api_key=${APP.apiKey}&ref=${ref}`;
+    // TO DO: how to fetch based on ref??
+    let response = await fetch(url)
+
+    let suggestSpan = document.querySelector('.ref-keyword');
+      if (ref && suggestSpan) {
+        suggestSpan.textContent = ref;
+      }
+
+    try {
+      if (!response.ok) throw new Error(response.message)
+        let suggestResults = {
+          id: id, // TO DO: switch to ES6 modules in type script (package.json)
+          results: await response.json()
+        }
+        return APP.saveSuggest(suggestResults)
+      } catch (error) {
+        console.warn('Could not fetch movies', error)
+      }
+  },
+
+  saveSuggest(suggestResults) {
+    let transaction = APP.makeTransaction('suggestStore', 'readwrite')
+    transaction.oncomplete = (ev) => {
+      console.log('ONCOMPLETE', ev)
+      APP.buildAnotherList(suggestResults) 
+    }
+
+    let store = transaction.objectStore('suggestStore')
+    let request = store.add(suggestResults)
+
+    request.onsuccess = (ev) => {
+      console.log('successfully added suggested movies', ev) // that the add request is a success
     }
     request.onerror = (error) => {
       console.log('error in request to add', error)
