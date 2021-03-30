@@ -47,7 +47,6 @@ const APP = {
   }, 
   
   addListeners() {
-    //TODO:
     //listen for on and off line events
     window.addEventListener('online', (event) => {
       console.log('Connection back online', event)
@@ -169,7 +168,8 @@ const APP = {
       if (request.length === 0) {
         APP.getData(keyword)
       } else {
-        APP.buildList(request)
+        let movies = request[0].results
+        APP.buildList(movies)
       }  
     }
   },
@@ -191,7 +191,8 @@ const APP = {
       if (request.length === 0) {
         APP.getSuggest({ id, ref })
       } else {
-        APP.buildList(request)
+        let movies = request[0].results
+        APP.buildList(movies)
       }  
     }
   },
@@ -221,7 +222,8 @@ const APP = {
     let transaction = APP.makeTransaction('movieStore', 'readwrite')
     transaction.oncomplete = (ev) => {
       console.log('ONCOMPLETE', ev)
-      APP.buildAnotherList(movieResults) 
+      let movies = movieResults.results
+      APP.buildList(movies) 
     }
 
     let store = transaction.objectStore('movieStore')
@@ -265,7 +267,8 @@ const APP = {
     let transaction = APP.makeTransaction('suggestStore', 'readwrite')
     transaction.oncomplete = (ev) => {
       console.log('ONCOMPLETE', ev)
-      APP.buildAnotherList(suggestResults) 
+      let movies = suggestResults.results
+      APP.buildList(movies) 
     }
 
     let store = transaction.objectStore('suggestStore')
@@ -279,7 +282,7 @@ const APP = {
     }
   },
 
-  buildList(request) {
+  buildList(movies) {
     // change title results
     let params = new URL(document.location).searchParams;
     let keyword = params.get('keyword');
@@ -297,11 +300,10 @@ const APP = {
         suggestSpan.textContent = ref;
     }
 
-    let movieResults = request[0].results
-    console.log(movieResults.results)
+    console.log(movies.results)
 
     let container = document.querySelector('.movies')
-    container.innerHTML = movieResults.results
+    container.innerHTML = movies.results
     .map ( movie => {
       let img = './img/icon-512x512.png';
       if (movie.poster_path != null) {
@@ -329,38 +331,38 @@ const APP = {
     }).join('\n') // array of html that will be joined together
   },
 
-  buildAnotherList(movieResults) {
-    console.log('I AM TRYING TO BUILD YOU', movieResults.results)
-    let fetched = movieResults.results
+  // buildAnotherList(movieResults) {
+  //   console.log('I AM TRYING TO BUILD YOU', movieResults.results)
+  //   let fetched = movieResults.results
 
-    let container = document.querySelector('.movies')
-    container.innerHTML = fetched.results
-    .map ( movie => {
-      let img = './img/icon-512x512.png';
-      if (movie.poster_path != null) {
-        img = APP.imgURL + 'w500/' + movie.poster_path;
-      } else {
-        img = APP.noImgUrl
-      }
+  //   let container = document.querySelector('.movies')
+  //   container.innerHTML = fetched.results
+  //   .map ( movie => {
+  //     let img = './img/icon-512x512.png';
+  //     if (movie.poster_path != null) {
+  //       img = APP.imgURL + 'w500/' + movie.poster_path;
+  //     } else {
+  //       img = APP.noImgUrl
+  //     }
 
-      return `<div class="card hoverable large" data-id="${movie.id}">
-      <div class="card-image">
-        <img src="${img}" alt="movie poster" class="notmaterialboxed"/>
-        </div>
-      <div class="card-content activator">
-        <h3 class="card-title"><span>${movie.title}</span><i class="material-icons right">more_vert</i></h3>
-      </div>
-      <div class="card-reveal">
-        <span class="card-title grey-text text-darken-4">${movie.title}<i class="material-icons right">close</i></span>
-        <h6>${movie.release_date}</h6>
-        <p>${movie.overview}</p>
-      </div>
-      <div class="card-action">
-        <a href="#" class="find-suggested light-blue-text text-darken-3">Show Similar<i class="material-icons right">search</i></a>
-      </div>
-    </div>`
-    }).join('\n') // array of html that will be joined together
-  },
+  //     return `<div class="card hoverable large" data-id="${movie.id}">
+  //     <div class="card-image">
+  //       <img src="${img}" alt="movie poster" class="notmaterialboxed"/>
+  //       </div>
+  //     <div class="card-content activator">
+  //       <h3 class="card-title"><span>${movie.title}</span><i class="material-icons right">more_vert</i></h3>
+  //     </div>
+  //     <div class="card-reveal">
+  //       <span class="card-title grey-text text-darken-4">${movie.title}<i class="material-icons right">close</i></span>
+  //       <h6>${movie.release_date}</h6>
+  //       <p>${movie.overview}</p>
+  //     </div>
+  //     <div class="card-action">
+  //       <a href="#" class="find-suggested light-blue-text text-darken-3">Show Similar<i class="material-icons right">search</i></a>
+  //     </div>
+  //   </div>`
+  //   }).join('\n') // array of html that will be joined together
+  // },
 
   makeTransaction (storeName, mode) {
     let transaction = APP.db.transaction(storeName, mode)
