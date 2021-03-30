@@ -68,13 +68,23 @@ const APP = {
     // TO DO: pass on search keyword from home to query string of searchResults.html
     // do i have to trim the keyword? What if user types in spaces in their keywords? - handle this
     event.preventDefault() 
-    const keyword = await event.target.search.value // whatever the value is inputted in the form
-    // window.location.href = `/pages/searchResults.html?keyword=${keyword}` 
+    const searchInput = await event.target.search.value // whatever the value is inputted in the form
+    const keyword = searchInput.trim()
+
+    // TO DO: reloads each time and I lose my buildList
+    // build query string and go to results page
+    // if (keyword){
+    //   let base = location.origin
+    //   let url = new URL('/pages/searchResults.html', base)
+    //   url.search = '?keyword=' + encodeURIComponent(keyword)
+    //   location.href = url
+    // }
+    // location.href = `/pages/searchResults.html?keyword=${keyword}` 
     console.log('The keyword you entered is:', keyword)
-    APP.checkDB(keyword)
+    APP.checkMovieStore(keyword)
   },
 
-  async checkDB (keyword) {
+  async checkMovieStore (keyword) {
     // first check if keyword exists in db else fetch
     
     let transaction = await APP.makeTransaction('movieStore', 'readonly')
@@ -132,6 +142,11 @@ const APP = {
   async getData (keyword){
     let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
     const response = await fetch(url) 
+
+    let keywordSpan = document.querySelector('.ref-keyword');
+    if (keyword && keywordSpan) {
+      keywordSpan.textContent = keyword;
+    }
 
     try {
       if (!response.ok) throw new Error(response.message)
