@@ -110,29 +110,8 @@ const APP = {
       console.log('Launched: Browser Tab');
       APP.isStandalone = false;
     }
-  },
-
-  pageLoaded() {
-    console.log('page loaded and checking', location.search)
-    let params = new URL(document.location).searchParams;
-    let keyword = params.get('keyword');
-    console.log('HERE IS YOUR KEYWORD FROM QUERYSTRING', keyword)
-    
-    if (keyword) {
-      //means we are on results.html
-      APP.checkMovieStore(keyword)
-      console.log(`on searchResults.html - startSearch(${keyword})`);
-    }
-
-    let id = parseInt(params.get('movie_id'));
-    let ref = params.get('ref');
-    if (id && ref) {
-      //we are on suggest.html
-      console.log(`look in db for movie_id ${id} or do fetch`);
-      APP.getSuggest({ id, ref });
-    }
-  },
-
+  }, 
+  
   async handleFormSubmit(event) {
     // TO DO: reloads each time and I lose my buildList
     // build query string and go to results page
@@ -161,6 +140,27 @@ const APP = {
     
   },
 
+  pageLoaded() {
+    console.log('page loaded and checking', location.search)
+    let params = new URL(document.location).searchParams;
+    let keyword = params.get('keyword');
+    console.log('HERE IS YOUR KEYWORD FROM QUERYSTRING', keyword)
+    
+    if (keyword) {
+      //means we are on results.html
+      APP.checkMovieStore(keyword)
+      console.log(`on searchResults.html - startSearch(${keyword})`);
+    }
+
+    let id = parseInt(params.get('movie_id'));
+    let ref = params.get('ref');
+    if (id && ref) {
+      //we are on suggest.html
+      console.log(`look in db for movie_id ${id} or do fetch`);
+      APP.checkSuggestStore({ id, ref });
+    }
+  },
+
   async checkMovieStore (keyword) {
     // first check if keyword exists in db else fetch
     
@@ -178,6 +178,28 @@ const APP = {
       console.log('I exist', request)
       if (request.length === 0) {
         APP.getData(keyword)
+      } else {
+        APP.buildList(request)
+      }  
+    }
+  },
+
+  async checkSuggestStore ({ id, ref }) {
+    let transaction = await APP.makeTransaction('suggestStore', 'readonly')
+    console.log(id)
+    transaction.oncomplete = (event) => {
+      // transaction for reading all objs is complete
+      console.log('Successfully found it in db',event)
+    }
+    let store = transaction.objectStore('suggestStore')
+    let getRequest = await store.getAll(id) //returns an arra
+
+    getRequest.onsuccess = (event) => {
+      // getAll was successful
+      let request = event.target.result
+      console.log('I exist', request)
+      if (request.length === 0) {
+        APP.getSuggest({ id, ref })
       } else {
         APP.buildList(request)
       }  
@@ -276,6 +298,14 @@ const APP = {
       if (keyword && keywordSpan) {
         keywordSpan.textContent = keyword;
       }
+
+    let searchQuery = new URL(document.location).searchParams
+    let ref = searchQuery.get('ref')
+    
+    let suggestSpan = document.querySelector('.ref-keyword');
+      if (ref && suggestSpan) {
+        suggestSpan.textContent = ref;
+    }
 
     let movieResults = request[0].results
     console.log(movieResults.results)
