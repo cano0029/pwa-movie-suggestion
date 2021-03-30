@@ -1,20 +1,3 @@
-import {
-  get, // retrieve
-  set, // save
-  getMany,
-  setMany,
-  update, // change
-  del, // delete
-  clear,
-  keys,
-  values,
-  entries,
-  createStore,
-} from 'https://cdn.jsdelivr.net/npm/idb-keyval@5/dist/esm/index.js';
-//importing all of these methods, which return Promises - we can chain then and catch to them to deal with responses
-//default DB name is 'keyval-store' (like a document DB)
-//default store name is 'keyval'    (like a Collection in the DB)
-
 const APP = {
   /*************
         SAMPLE MOVIEDB URLS
@@ -87,28 +70,24 @@ const APP = {
 
     // movie div is clicked
     let movies = document.querySelector('.movies')
-    if (movies) {
-      //navigate to the suggested page
-      //build the queryString with movie id and ref title
-      movies.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        let anchor = ev.target;
-        if (anchor.tagName === 'A') {
-          let card = anchor.closest('.card');
-          let title = card.querySelector('.card-title span').textContent;
-          let mid = card.getAttribute('data-id');
-          let base = location.origin;
-          let url = new URL('/pages/suggestedMovies.html', base);
-          url.search = `?movie_id=${mid}&ref=${encodeURIComponent(title)}`;
-          location.href = url;
-        }
-      })
+    if (movies) { 
+      movies.addEventListener('click', APP.navigateSuggestPage) 
     }
   },
 
   navigateSuggestPage (event) {
     event.preventDefault()
-  }
+    let anchor = event.target;
+    if (anchor.tagName === 'A') {
+      let card = anchor.closest('.card');
+      let title = card.querySelector('.card-title span').textContent;
+      let mid = card.getAttribute('data-id');
+      let base = location.origin;
+      let url = new URL('/pages/suggestedMovies.html', base);
+      url.search = `?movie_id=${mid}&ref=${encodeURIComponent(title)}`;
+      location.href = url;
+    }
+  },
 
   checkVersion () {
     if (navigator.standalone) {

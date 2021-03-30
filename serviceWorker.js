@@ -85,7 +85,7 @@ self.addEventListener('fetch', event => {
         dynamicCache.put(event.request, networkResponse.clone())
         // TO DO: control which assets go into dynamic cache here - suggest and movie results html as well as their images
         // right now it is storing everything that is not already in static cache
-        maxCacheSize(DYNAMIC_CACHE, 50)
+        maxCacheSize(DYNAMIC_CACHE, 45)
         return networkResponse
       } catch(error) {
         const requestedPage = event.request.url.indexOf('.html')
