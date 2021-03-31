@@ -15,14 +15,18 @@ nav {
   margin-right: 1rem;
   transform: translateY(0.2rem)
 }
+form #searchForm {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
 
 input#search {
-  position: sticky;
   top: 0;
-  border: 2px grey;
   border-radius: 10px;
   margin-top: 2rem;
   margin-bottom: 2rem;
+  box-shadow: none;
 }
 .input-field{
   border-radius: 40px;
@@ -33,7 +37,7 @@ input#search {
   background-color: #0F1416;
 }
 
-.page h6 {
+.page h6.white-text {
   margin-top: 2rem;
   margin-left: 1rem;
   line-height: 25px;
@@ -46,6 +50,22 @@ input#search {
   justify-content: center;
   background: none;
   transform: translateY(20rem);
+}
+#btnInstall {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-color: rgb(216, 216, 216);
+  border-radius: 20px;
+  color: white;
+  padding: 0.5rem 1rem;
+}
+#btnInstall p {
+  margin: 0;
+}
+#btnInstall .description {
+  padding-left: 0.5rem;
 }
 #homeInstructions {
   margin-top: 5rem;
@@ -78,6 +98,11 @@ h5 span {
   width: 85vw;
   margin: 3rem auto;
   box-shadow: 8px 10px 20px black
+}
+
+.movieLang {
+  margin-top: 3rem;
+  text-transform: uppercase ;
 }
 
 /* offline page */

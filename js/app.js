@@ -345,7 +345,7 @@ const APP = {
         <span class="card-title grey-text text-darken-4">${movie.title}<i class="material-icons right">close</i></span>
         <h6>${movie.release_date}</h6>
         <p>${movie.overview}</p>
-        <p>${movie.original_language}</p>
+        <p class= "movieLang">${movie.original_language}</p>
       </div>
       <div class="card-action">
         <a href="#" class="find-suggested teal-text text-accent-4">Show Similar Movies<i class="material-icons right">theaters</i></a>
