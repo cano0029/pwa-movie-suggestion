@@ -33,8 +33,9 @@ input#search {
   height: 1rem;
 }
 
-.nav-wrapper{
-  background-color: #0F1416;
+::placeholder {
+  color: rgba(0, 0, 0, 0.419);
+  opacity: 1; /* Firefox */
 }
 
 .page h6.white-text {
