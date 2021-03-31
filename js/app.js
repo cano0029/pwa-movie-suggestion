@@ -302,7 +302,7 @@ const APP = {
         <img src="${img}" alt="movie poster" class="notmaterialboxed"/>
         </div>
       <div class="card-content activator">
-        <h5 class="card-title"><span>${movie.title}</span><i class="material-icons right">more_vert</i></h5>
+        <h5 class="card-title"><span>${movie.title}</span><i class="material-icons right">expand_more</i></h5>
       </div>
       <div class="card-reveal">
         <span class="card-title grey-text text-darken-4">${movie.title}<i class="material-icons right">close</i></span>
@@ -311,7 +311,7 @@ const APP = {
         <p>${movie.original_language}</p>
       </div>
       <div class="card-action">
-        <a href="#" class="find-suggested light-blue-text text-darken-3">Show Similar Movies<i class="material-icons right">search</i></a>
+        <a href="#" class="find-suggested teal-text text-accent-4">Show Similar Movies<i class="material-icons right">theaters</i></a>
       </div>
     </div>`
     }).join('\n') // array of html that will be joined together
