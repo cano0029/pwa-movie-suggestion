@@ -20,6 +20,7 @@ const STATIC_ASSETS = [
   '/img/icons/mstile-150x150.png',
   '/img/icons/safari-pinned-tab.svg',
   '/img/logo/logo.png',
+  '/img/logo/tmdb-logo.svg',
   '/img/gr-stocks-q8P8YoR6erg-unsplash.jpg',
   '/manifest.json',
   'https://fonts.googleapis.com/icon?family=Material+Icons',
