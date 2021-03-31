@@ -123,22 +123,9 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
-// TO DO: what is this??
+// sends message to the service worker
 self.addEventListener('message', ({ data }) => {
-  console.log('Message', data)
-});
+  console.log('Message from service worker', data)
+})
 
-// TO DO: what is this??
-const sendMessage = async (msg) => {
-  //send a message from the service worker to the webpage(s)
-  let allClients = await clients.matchAll({ includeUncontrolled: true });
-  return Promise.all(
-    allClients.map((client) => {
-      let channel = new MessageChannel();
-      channel.port1.onmessage = onMessage;
-      //port1 for send port2 for receive
-      return client.postMessage(msg, [channel.port2]);
-    })
-  );
-};
 

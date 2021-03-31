@@ -27,6 +27,7 @@ const APP = {
   moviedbStore: null,
   dbVersion: 2,
   
+  isOnline: true,
   deferredInstall: null,
   isStandalone: false,
 
@@ -50,13 +51,21 @@ const APP = {
   addListeners() {
     //listen for on and off line events
     window.addEventListener('online', (event) => {
-      // TO DO : tell service worker
-      console.log('Connection back online', event)
+      console.log(event)
+      let message = {
+        isOnline: true,
+        description: 'Connection back online'
+      }
+      navigator.serviceWorker.controller.postMessage(message)
     })
 
     window.addEventListener('offline', (event) => {
-      // TO DO : tell service worker
-      console.log('Connection lost. Offline.', event)
+      console.log(event)
+      let message = {
+        isOnline: false,
+        description: 'Connection lost. Offline.'
+      }
+      navigator.serviceWorker.controller.postMessage(message)
     })
 
     //listen for Chrome install prompt- handle the deferredPrompt
@@ -73,10 +82,11 @@ const APP = {
         appInstalled: true
       }
       navigator.serviceWorker.controller.postMessage(message)
-    });
+    })
 
     let btnInstall = document.getElementById('btnInstall')
     btnInstall?.addEventListener('click', APP.startChromeInstall)
+    
     // listen for submit of the search form in home.html
     document.getElementById('searchForm').addEventListener('submit', APP.handleFormSubmit)
 
