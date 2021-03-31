@@ -186,6 +186,7 @@ const APP = {
   async getData (keyword){
       let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
       const response = await fetch(url) 
+      
 
       let keywordSpan = document.querySelector('.ref-keyword');
       if (keyword && keywordSpan) {
@@ -286,8 +287,6 @@ const APP = {
         suggestSpan.textContent = ref;
     }
 
-    console.log(movies.results)
-
     let container = document.querySelector('.movies')
     container.innerHTML = movies.results
     .map ( movie => {
@@ -297,21 +296,22 @@ const APP = {
       } else {
         img = APP.noImgUrl
       }
-
-      return `<div class="card hoverable large" data-id="${movie.id}">
+      
+      return `<div class=" movieCard card hoverable medium" data-id="${movie.id}">
       <div class="card-image">
         <img src="${img}" alt="movie poster" class="notmaterialboxed"/>
         </div>
       <div class="card-content activator">
-        <h3 class="card-title"><span>${movie.title}</span><i class="material-icons right">more_vert</i></h3>
+        <h5 class="card-title"><span>${movie.title}</span><i class="material-icons right">more_vert</i></h5>
       </div>
       <div class="card-reveal">
         <span class="card-title grey-text text-darken-4">${movie.title}<i class="material-icons right">close</i></span>
         <h6>${movie.release_date}</h6>
         <p>${movie.overview}</p>
+        <p>${movie.original_language}</p>
       </div>
       <div class="card-action">
-        <a href="#" class="find-suggested light-blue-text text-darken-3">Show Similar<i class="material-icons right">search</i></a>
+        <a href="#" class="find-suggested light-blue-text text-darken-3">Show Similar Movies<i class="material-icons right">search</i></a>
       </div>
     </div>`
     }).join('\n') // array of html that will be joined together
