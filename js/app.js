@@ -1,17 +1,4 @@
-const APP = {
-  /*************
-        SAMPLE MOVIEDB URLS
-        
-        1. To get the config data like image base urls
-        https://api.themoviedb.org/3/configuration?api_key=<apiKey>
-        
-        2. To fetch a list of movies based on a keyword
-        https://api.themoviedb.org/3/search/movie?api_key=<apiKey>&query=<keyword>
-        
-        3. To fetch more details about a movie
-        https://api.themoviedb.org/3/movie/<movie-id>?api_key=<apiKey>
-  *************/
-  
+const APP = {  
   apiKey: '8b315e48d59ed2c712994a028435c067',
   baseURL: 'https://api.themoviedb.org/3/',
   imgURL: 'https://image.tmdb.org/t/p/',
@@ -25,22 +12,21 @@ const APP = {
   
   db: null,
   moviedbStore: null,
-  dbVersion: 2,
+  dbVersion: 1,
   
   isOnline: true,
   deferredInstall: null,
   isStandalone: false,
 
-  init(){
+  init() {
     try {
       if('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/serviceWorker.js')
-          console.log('Service worker registered')
         })
       }
     } catch (error) {
-      console.log('Service worker not registered', error)
+      console.log('Something went wrong in registering service worker:', error)
     }
 
     APP.openDB()
@@ -49,7 +35,7 @@ const APP = {
   }, 
   
   addListeners() {
-    //listen for on and off line events
+
     window.addEventListener('online', (event) => {
       console.log(event)
       let message = {
@@ -68,14 +54,12 @@ const APP = {
       navigator.serviceWorker.controller.postMessage(message)
     })
 
-    //listen for Chrome install prompt- handle the deferredPrompt
     window.addEventListener('beforeinstallprompt', (event) => {
       event.preventDefault()
       APP.deferredInstall = event
       console.log('deferred install event saved')
     });
 
-    //listen for sign that app was installed
     window.addEventListener('appinstalled', (event) => {
       console.log('App was installed', event);
       let message = {
@@ -87,24 +71,35 @@ const APP = {
     let btnInstall = document.getElementById('btnInstall')
     btnInstall?.addEventListener('click', APP.startChromeInstall)
     
-    // listen for submit of the search form in home.html
     document.getElementById('searchForm').addEventListener('submit', APP.handleFormSubmit)
 
-    // movie div is clicked
     let movies = document.querySelector('.movies')
     if (movies) { 
       movies.addEventListener('click', APP.navigateSuggestPage) 
     }
   },
+  
+  checkInstall () {
+    if (navigator.standalone) {
+      console.log('Launched Location: Installed (iOS)')
+      APP.isStandalone = true;
+    } else if (matchMedia('(display-mode: standalone)').matches) {
+      console.log('Launch Location: Installed (PWA)')
+      APP.isStandalone = true;
+    } else {
+      console.log('Launch Location: Browser Tab')
+      APP.isStandalone = false;
+    }
+  }, 
 
   startChromeInstall () {
     if (APP.deferredInstall) {
       APP.deferredInstall.prompt()
       APP.deferredInstall.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the install prompt');
+          console.log('User accepted the install prompt')
         } else {
-          console.log('User dismissed the install prompt');
+          console.log('User dismissed the install prompt')
         }
       })
     }
@@ -124,19 +119,6 @@ const APP = {
     }
   },
 
-  checkInstall () {
-    if (navigator.standalone) {
-      console.log('Launched: Installed (iOS)');
-      APP.isStandalone = true;
-    } else if (matchMedia('(display-mode: standalone)').matches) {
-      console.log('Launched: Installed');
-      APP.isStandalone = true;
-    } else {
-      console.log('Launched: Browser Tab');
-      APP.isStandalone = false;
-    }
-  }, 
-  
   async handleFormSubmit(event) {
     event.preventDefault()
     const searchInput = await event.target.search.value // whatever the value is inputted in the form
@@ -153,44 +135,32 @@ const APP = {
   },
 
   pageLoaded() {
-    console.log('page loaded and checking', location.search)
     let params = new URL(document.location).searchParams;
     let keyword = params.get('keyword');
-    console.log('HERE IS YOUR KEYWORD FROM QUERYSTRING', keyword)
     
-    if (keyword) {
-      //means we are on results.html
-      APP.checkMovieStore(keyword)
-      console.log(`on searchResults.html - startSearch(${keyword})`);
-    }
+    if (keyword) { APP.checkMovieStore(keyword) }
 
     let id = parseInt(params.get('movie_id'));
     let ref = params.get('ref');
     if (id && ref) {
-      //we are on suggest.html
-      console.log(`look in db for movie_id ${id} or do fetch`);
       APP.checkSuggestStore({ id, ref });
     }
   },
 
   async checkMovieStore (keyword) {
-    // first check if keyword exists in db else fetch
-    
     let transaction = await APP.makeTransaction('movieStore', 'readonly')
-    transaction.oncomplete = (event) => {
-      // transaction for reading all objs is complete
-      console.log('Successfully found it in db',event)
+    transaction.oncomplete = () => {
+      console.log('Task of looking in movieStore for already saved movie results is complete')
     }
     let store = transaction.objectStore('movieStore')
     let getRequest = await store.getAll(keyword) //returns an array
 
     getRequest.onsuccess = (event) => {
-      // getAll was successful
       let request = event.target.result
-      console.log('I exist', request)
       if (request.length === 0) {
         APP.getData(keyword)
       } else {
+        console.log(`Movie results found under "${keyword}" is already saved in movieStore`)
         let movies = request[0].results
         APP.buildList(movies)
       }  
@@ -199,21 +169,19 @@ const APP = {
 
   async checkSuggestStore ({ id, ref }) {
     let transaction = await APP.makeTransaction('suggestStore', 'readonly')
-    console.log(id)
-    transaction.oncomplete = (event) => {
-      // transaction for reading all objs is complete
-      console.log('Successfully found it in db',event)
+
+    transaction.oncomplete = () => {
+      console.log('Task of looking in suggestStore for the movie id is complete')
     }
     let store = transaction.objectStore('suggestStore')
     let getRequest = await store.getAll(id) //returns an arra
 
     getRequest.onsuccess = (event) => {
-      // getAll was successful
       let request = event.target.result
-      console.log('I exist', request)
       if (request.length === 0) {
         APP.getSuggest({ id, ref })
       } else {
+        console.log(`Similar movies under genre if "${id}" is already saved in the suggestStore`)
         let movies = request[0].results
         APP.buildList(movies)
       }  
@@ -224,7 +192,7 @@ const APP = {
       let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
       const response = await fetch(url) 
       
-
+      // TO DO: move to separate function
       let keywordSpan = document.querySelector('.ref-keyword');
       if (keyword && keywordSpan) {
         keywordSpan.textContent = keyword;
@@ -243,13 +211,10 @@ const APP = {
   },
   
   async getSuggest({ id, ref }) {
-    //TODO: Do the search of IndexedDB for matches
-    //if no matches to a fetch call to TMDB API
-    //or make the fetch call and intercept it in the SW
     let url = `${APP.baseURL}movie/${id}/similar?api_key=${APP.apiKey}&ref=${ref}`;
-    // TO DO: how to fetch based on ref??
     let response = await fetch(url)
 
+    // TO DO: move to separate function
     let suggestSpan = document.querySelector('.ref-keyword');
       if (ref && suggestSpan) {
         suggestSpan.textContent = ref;
@@ -269,8 +234,7 @@ const APP = {
 
   saveResults (movieResults) {
     let transaction = APP.makeTransaction('movieStore', 'readwrite')
-    transaction.oncomplete = (ev) => {
-      console.log('ONCOMPLETE', ev)
+    transaction.oncomplete = () => {
       let movies = movieResults.results
       APP.buildList(movies) 
     }
@@ -278,19 +242,19 @@ const APP = {
     let store = transaction.objectStore('movieStore')
     let request = store.add(movieResults)
 
-
-    request.onsuccess = (ev) => {
-      console.log('successfully added an object', ev) // that the add request is a success
+    request.onsuccess = () => {
+      let message = { event_description : 'Successfully added movie results to movieStore' }
+      navigator.serviceWorker.controller.postMessage(message)
     }
-    request.onerror = (error) => {
-      console.log('error in request to add', error)
+    request.onerror = () => {
+      let message = { event_description : 'Something went wrong in adding movie results to movieStore' }
+      navigator.serviceWorker.controller.postMessage(message)
     }
   },
 
   saveSuggest(suggestResults) {
     let transaction = APP.makeTransaction('suggestStore', 'readwrite')
     transaction.oncomplete = (ev) => {
-      console.log('ONCOMPLETE', ev)
       let movies = suggestResults.results
       APP.buildList(movies) 
     }
@@ -298,16 +262,18 @@ const APP = {
     let store = transaction.objectStore('suggestStore')
     let request = store.add(suggestResults)
 
-    request.onsuccess = (ev) => {
-      console.log('successfully added suggested movies', ev) // that the add request is a success
+    request.onsuccess = () => {
+      let message = { event_description : 'Successfully added suggested movies to suggestStore' }
+      navigator.serviceWorker.controller.postMessage(message)
     }
-    request.onerror = (error) => {
-      console.log('error in request to add', error)
+    request.onerror = () => {
+      let message = { event_description : 'Something went wrong in adding suggested to movieStore' }
+      navigator.serviceWorker.controller.postMessage(message)
     }
   },
 
   buildList(movies) {
-    // change title results
+    //  TO DO: move to separate function
     let params = new URL(document.location).searchParams;
     let keyword = params.get('keyword');
 
@@ -315,7 +281,8 @@ const APP = {
       if (keyword && keywordSpan) {
         keywordSpan.textContent = keyword;
       }
-
+    
+    //  TO DO: move to separate function
     let searchQuery = new URL(document.location).searchParams
     let ref = searchQuery.get('ref')
 
@@ -363,18 +330,14 @@ const APP = {
   },
 
   openDB() {
-    //TODO:
-    //open the indexedDB
     let dbOpenRequest = indexedDB.open('movieDB', APP.dbVersion)
     
-    //upgradeneeded listener
     dbOpenRequest.addEventListener('upgradeneeded', (event) => {
       APP.db = event.target.result
-      console.log('upgrade', APP.db)
 
       let oldVersion = event.oldVersion
       let newVersion = event.newVersion || APP.db.version
-      console.log('DB updated from version', oldVersion, 'to', newVersion)
+      console.log(`movieDB Version Update: From version ${oldVersion} to version ${newVersion}`)
       
       if( !APP.db.objectStoreNames.contains('movieStore' && 'suggestStore')) { 
         APP.moviedbStore = APP.db.createObjectStore('movieStore', { keyPath: 'keyword' })
@@ -382,17 +345,13 @@ const APP = {
       }
     })
     
-    //success listener
-    //save db reference as APP.db
     dbOpenRequest.addEventListener('success', (event) => {
       APP.db = event.target.result
-      console.log('success', APP.db)
       APP.pageLoaded()
     })
     
-    //error listener
     dbOpenRequest.addEventListener('error', (error) => {
-      console.warn(error)
+      console.warn('Something went wrong with opening movieDB stores:',error)
     })
   },
 
