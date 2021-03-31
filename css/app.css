@@ -45,12 +45,19 @@ input#search {
 
 /* home page */
 
+.moviedb-logo{
+  width: 20%;
+  margin: 0 auto;
+  margin-top: 10rem;
+}
+
 .btn-container {
+  margin: 5rem;
   display: flex;
   justify-content: center;
   background: none;
-  transform: translateY(20rem);
 }
+
 #btnInstall {
   display: flex;
   flex-direction: row;
