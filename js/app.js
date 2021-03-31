@@ -48,10 +48,12 @@ const APP = {
   addListeners() {
     //listen for on and off line events
     window.addEventListener('online', (event) => {
+      // TO DO : tell service worker
       console.log('Connection back online', event)
     })
 
     window.addEventListener('offline', (event) => {
+      // TO DO : tell service worker
       console.log('Connection lost. Offline.', event)
     })
 

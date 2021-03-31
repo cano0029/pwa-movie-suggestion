@@ -73,6 +73,7 @@ self.addEventListener('activate', event => {
 
 // create and return dynamic cache if offline
 self.addEventListener('fetch', event => {
+  if (event.request.method === 'GET') {
   event.respondWith(
     (async () => {
       const cachedResponse = await caches.match(event.request)
@@ -86,13 +87,13 @@ self.addEventListener('fetch', event => {
         maxCacheSize(DYNAMIC_CACHE, 45)
         return networkResponse
       } catch(error) {
-        const requestedPage = event.request.url.indexOf('.html')
-        if(requestedPage > -1) { // it will only show offline page if user is trying to go to a page (not when it is trying to load an image etc.)
-          return caches.match(OFFLINE_URL)
-        } 
+        console.log(error, "Returning offline page instead");
+        const cache = await caches.open(STATIC_CACHE);
+        const cachedResponse = await cache.match(OFFLINE_URL);
+        return cachedResponse;
       }
     })()
-  )
+  )}
 })
 
 self.addEventListener("fetch", (event) => {
