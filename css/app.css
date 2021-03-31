@@ -40,6 +40,13 @@ input#search {
 }
 
 /* home page */
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+  background: none;
+  transform: translateY(20rem);
+}
 #homeInstructions {
   margin-top: 5rem;
   margin-bottom: 5rem;

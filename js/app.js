@@ -22,10 +22,12 @@ const APP = {
   profile_sizes: ['w45', 'w185', 'h632', 'original'],
   still_sizes: ['w92', 'w185', 'w300', 'original'],
 
+  
   db: null,
   moviedbStore: null,
   dbVersion: 2,
-
+  
+  deferredInstall: null,
   isStandalone: false,
 
   init(){
@@ -57,14 +59,24 @@ const APP = {
       console.log('Connection lost. Offline.', event)
     })
 
-    //TODO:
     //listen for Chrome install prompt- handle the deferredPrompt
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault()
+      APP.deferredInstall = event
+      console.log('deferred install event saved')
+    });
 
     //listen for sign that app was installed
     window.addEventListener('appinstalled', (event) => {
-      console.log('app was installed', event);
+      console.log('App was installed', event);
+      let message = {
+        appInstalled: true
+      }
+      navigator.serviceWorker.controller.postMessage(message)
     });
 
+    let btnInstall = document.getElementById('btnInstall')
+    btnInstall?.addEventListener('click', APP.startChromeInstall)
     // listen for submit of the search form in home.html
     document.getElementById('searchForm').addEventListener('submit', APP.handleFormSubmit)
 
@@ -72,6 +84,19 @@ const APP = {
     let movies = document.querySelector('.movies')
     if (movies) { 
       movies.addEventListener('click', APP.navigateSuggestPage) 
+    }
+  },
+
+  startChromeInstall () {
+    if (APP.deferredInstall) {
+      APP.deferredInstall.prompt()
+      APP.deferredInstall.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+        } else {
+          console.log('User dismissed the install prompt');
+        }
+      })
     }
   },
 

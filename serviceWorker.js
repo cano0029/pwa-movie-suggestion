@@ -26,9 +26,8 @@ const STATIC_ASSETS = [
   'https://fonts.gstatic.com/s/materialicons/v82/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2'
 ]
 
-const DYNAMIC_ASSETS = []
 
-const maxCacheSize = (cacheName, maxSize) => {
+function maxCacheSize(cacheName, maxSize) {
   caches.open(cacheName)
   .then(cache => { cache.keys()
     .then(keys => {
@@ -39,6 +38,7 @@ const maxCacheSize = (cacheName, maxSize) => {
     })
   })
 }
+
 
 // listen when service worker is installed - then create static cache
 self.addEventListener('install', event => {
@@ -84,7 +84,7 @@ self.addEventListener('fetch', event => {
       try{
         const networkResponse = await fetch(event.request)
         dynamicCache.put(event.request, networkResponse.clone())
-        maxCacheSize(DYNAMIC_CACHE, 45)
+        maxCacheSize(DYNAMIC_CACHE, 50)
         return networkResponse
       } catch(error) {
         console.log(error, "Returning offline page instead");
@@ -128,6 +128,7 @@ self.addEventListener('message', ({ data }) => {
   console.log('Message', data)
 });
 
+// TO DO: what is this??
 const sendMessage = async (msg) => {
   //send a message from the service worker to the webpage(s)
   let allClients = await clients.matchAll({ includeUncontrolled: true });
