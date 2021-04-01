@@ -27,7 +27,6 @@ const STATIC_ASSETS = [
   'https://fonts.gstatic.com/s/materialicons/v82/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2'
 ]
 
-
 function maxCacheSize(cacheName, maxSize) {
   caches.open(cacheName)
   .then(cache => { cache.keys()
@@ -39,7 +38,6 @@ function maxCacheSize(cacheName, maxSize) {
     })
   })
 }
-
 
 // listen when service worker is installed - then create static cache
 self.addEventListener('install', event => {

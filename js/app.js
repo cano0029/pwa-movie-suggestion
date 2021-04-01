@@ -127,13 +127,13 @@ const APP = {
 
   async handleFormSubmit(event) {
     event.preventDefault()
-    const searchInput = await event.target.search.value // whatever the value is inputted in the form
+    const searchInput = await event.target.search.value
     const keyword = searchInput.trim() 
 
       if (keyword){
         event.preventDefault()
         let base = location.origin
-        let url = new URL('/pages/searchResults.html', base) // creating a new URL each time - so it will reload
+        let url = new URL('/pages/searchResults.html', base) 
         url.search = '?keyword=' + encodeURIComponent(keyword)
         location.href = url  
         APP.clearForm()
@@ -159,7 +159,7 @@ const APP = {
       console.log('Task of looking in movieStore for already saved movie results is complete')
     }
     let store = transaction.objectStore('movieStore')
-    let getRequest = await store.getAll(keyword) //returns an array
+    let getRequest = await store.getAll(keyword) 
 
     getRequest.onsuccess = (event) => {
       let request = event.target.result
@@ -180,7 +180,7 @@ const APP = {
       console.log('Task of looking in suggestStore for the movie id is complete')
     }
     let store = transaction.objectStore('suggestStore')
-    let getRequest = await store.getAll(id) //returns an arra
+    let getRequest = await store.getAll(id) 
 
     getRequest.onsuccess = (event) => {
       let request = event.target.result
@@ -195,47 +195,52 @@ const APP = {
   },
   
   async getData (keyword){
-      let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
-      const response = await fetch(url) 
-      
-      // TO DO: move to separate function
-      let keywordSpan = document.querySelector('.ref-keyword');
-      if (keyword && keywordSpan) {
-        keywordSpan.textContent = keyword;
-      }
-
-      try {
-        if (!response.ok) throw new Error(response.message)
-          let movieResults = {
-            keyword: keyword, // TO DO: switch to ES6 modules in type script (package.json)
-            results: await response.json()
-          }
-          return APP.saveResults(movieResults)
-        } catch (error) {
-          console.warn('Could not fetch movies', error)
-        }
-  },
-  
-  async getSuggest({ id, ref }) {
-    let url = `${APP.baseURL}movie/${id}/similar?api_key=${APP.apiKey}&ref=${ref}`;
-    let response = await fetch(url)
-
-    // TO DO: move to separate function
-    let suggestSpan = document.querySelector('.ref-keyword');
-      if (ref && suggestSpan) {
-        suggestSpan.textContent = ref;
-      }
+    APP.getResultsTitle(keyword)
+    let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
+    const response = await fetch(url) 
 
     try {
       if (!response.ok) throw new Error(response.message)
-        let suggestResults = {
-          id: id, // TO DO: switch to ES6 modules in type script (package.json)
+        let movieResults = {
+          keyword: keyword, // TO DO: switch to ES6 modules in type script (package.json)
           results: await response.json()
         }
-        return APP.saveSuggest(suggestResults)
+      return APP.saveResults(movieResults)
+    } catch (error) {
+        console.warn('Could not fetch movies', error)
+    }
+  },
+
+  async getSuggest({ id, ref }) {
+    APP.getSuggestTitle(ref)
+    const url = `${APP.baseURL}movie/${id}/recommendations?api_key=${APP.apiKey}&ref=${ref}`;
+    const response = await fetch(url)
+
+      try {
+        if (response.ok) {
+          let suggestResults = {
+              id: id, // TO DO: switch to ES6 modules in type script (package.json)
+              results: await response.json()
+          }
+          return APP.saveSuggest(suggestResults)
+        }
       } catch (error) {
         console.warn('Could not fetch movies', error)
       }
+  },
+
+  getResultsTitle(keyword) {
+    let keywordSpan = document.querySelector('.ref-keyword');
+      if (keyword && keywordSpan) {
+        return keywordSpan.textContent = keyword;
+      }
+  },
+  
+  getSuggestTitle(ref) {
+    let suggestSpan = document.querySelector('.ref-keyword');
+    if (ref && suggestSpan) {
+      suggestSpan.textContent = ref;
+    }
   },
 
   saveResults (movieResults) {
@@ -250,17 +255,17 @@ const APP = {
 
     request.onsuccess = () => {
       let message = { event_description : 'Successfully added movie results to movieStore' }
-      navigator.serviceWorker.controller.postMessage(message)
+      console.log(message)
     }
     request.onerror = () => {
       let message = { event_description : 'Something went wrong in adding movie results to movieStore' }
-      navigator.serviceWorker.controller.postMessage(message)
+      console.log(message)
     }
   },
 
   saveSuggest(suggestResults) {
     let transaction = APP.makeTransaction('suggestStore', 'readwrite')
-    transaction.oncomplete = (ev) => {
+    transaction.oncomplete = () => {
       let movies = suggestResults.results
       APP.buildList(movies) 
     }
@@ -270,32 +275,22 @@ const APP = {
 
     request.onsuccess = () => {
       let message = { event_description : 'Successfully added suggested movies to suggestStore' }
-      navigator.serviceWorker.controller.postMessage(message)
+      console.log(message)
     }
     request.onerror = () => {
       let message = { event_description : 'Something went wrong in adding suggested to movieStore' }
-      navigator.serviceWorker.controller.postMessage(message)
+      console.log(message)
     }
   },
 
   buildList(movies) {
-    //  TO DO: move to separate function
     let params = new URL(document.location).searchParams;
     let keyword = params.get('keyword');
-
-    let keywordSpan = document.querySelector('.ref-keyword');
-      if (keyword && keywordSpan) {
-        keywordSpan.textContent = keyword;
-      }
+    APP.getResultsTitle(keyword)
     
-    //  TO DO: move to separate function
     let searchQuery = new URL(document.location).searchParams
     let ref = searchQuery.get('ref')
-
-    let suggestSpan = document.querySelector('.ref-keyword');
-      if (ref && suggestSpan) {
-        suggestSpan.textContent = ref;
-    }
+    APP.getSuggestTitle(ref)
 
     let container = document.querySelector('.movies')
     container.innerHTML = movies.results
