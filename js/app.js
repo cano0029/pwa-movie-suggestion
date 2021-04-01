@@ -1,3 +1,9 @@
+// TO DO: 
+// switch to ES6 modules in type script (package.json)
+// put html under pages at root
+// separate functions search results for "" 
+// change navigator sw messages back to console logs
+
 const APP = {  
   apiKey: '8b315e48d59ed2c712994a028435c067',
   baseURL: 'https://api.themoviedb.org/3/',
