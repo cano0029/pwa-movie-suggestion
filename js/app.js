@@ -2,7 +2,7 @@ const APP = {
   apiKey: '8b315e48d59ed2c712994a028435c067',
   baseURL: 'https://api.themoviedb.org/3/',
   imgURL: 'https://image.tmdb.org/t/p/',
-  noImgUrl: '/img/gr-stocks-q8P8YoR6erg-unsplash.jpg',
+  noImgUrl: '/img/stock-image.jpg',
   backdrop_sizes: ['w300', 'w780', 'w1280', 'original'],
   logo_sizes: ['w45', 'w92', 'w154', 'w185', 'w300', 'w500', 'original'],
   poster_sizes: ['w92', 'w154', 'w185', 'w342', 'w500', 'w780', 'original'],
