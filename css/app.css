@@ -1,12 +1,6 @@
 /* * * general * * */
-html {
-  font-size: 14px;
-}
 body {
   background-color: #0f1416;
-}
-nav {
-  height: 4.5rem;
 }
 #logo {
   width: 10%;
@@ -14,10 +8,8 @@ nav {
   transform: translateY(0.2rem)
 }
 input#search {
-  top: 0;
   border-radius: 40px;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin-top: 2rem 0;
   box-shadow: none;
 }
 .input-field{
@@ -50,7 +42,6 @@ input#search {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
   border-color: rgb(216, 216, 216);
   border-radius: 20px;
   color: white;
@@ -82,7 +73,6 @@ h5 span {
   font-size: 20px;
 }
 .movieCard {
-  width: 85vw;
   margin: 3rem auto;
   box-shadow: 8px 10px 20px black
 }
