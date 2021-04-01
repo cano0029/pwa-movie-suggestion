@@ -63,11 +63,9 @@ const APP = {
     window.addEventListener('beforeinstallprompt', (event) => {
       event.preventDefault()
       APP.deferredInstall = event
-      console.log('deferred install event saved')
     });
 
     window.addEventListener('appinstalled', (event) => {
-      console.log('App was installed', event);
       let message = {
         appInstalled: true
       }
@@ -187,7 +185,7 @@ const APP = {
       if (request.length === 0) {
         APP.getSuggest({ id, ref })
       } else {
-        console.log(`Similar movies under genre if "${id}" is already saved in the suggestStore`)
+        console.log(`Recommended movies under genre id "${id}" is already saved in the suggestStore`)
         let movies = request[0].results
         APP.buildList(movies)
       }  
@@ -195,7 +193,7 @@ const APP = {
   },
   
   async getData (keyword){
-    APP.getResultsTitle(keyword)
+    APP.postResultsTitle(keyword)
     let url = `${APP.baseURL}search/movie?api_key=${APP.apiKey}&query=${keyword}`
     const response = await fetch(url) 
 
@@ -212,7 +210,7 @@ const APP = {
   },
 
   async getSuggest({ id, ref }) {
-    APP.getSuggestTitle(ref)
+    APP.postSuggestTitle(ref)
     const url = `${APP.baseURL}movie/${id}/recommendations?api_key=${APP.apiKey}&ref=${ref}`;
     const response = await fetch(url)
 
@@ -229,20 +227,6 @@ const APP = {
       }
   },
 
-  getResultsTitle(keyword) {
-    let keywordSpan = document.querySelector('.ref-keyword');
-      if (keyword && keywordSpan) {
-        return keywordSpan.textContent = keyword;
-      }
-  },
-  
-  getSuggestTitle(ref) {
-    let suggestSpan = document.querySelector('.ref-keyword');
-    if (ref && suggestSpan) {
-      suggestSpan.textContent = ref;
-    }
-  },
-
   saveResults (movieResults) {
     let transaction = APP.makeTransaction('movieStore', 'readwrite')
     transaction.oncomplete = () => {
@@ -253,13 +237,11 @@ const APP = {
     let store = transaction.objectStore('movieStore')
     let request = store.add(movieResults)
 
-    request.onsuccess = () => {
-      let message = { event_description : 'Successfully added movie results to movieStore' }
-      console.log(message)
+    request.onsuccess = (event) => {
+      console.log('Successfully added movie results to movieStore', event)
     }
-    request.onerror = () => {
-      let message = { event_description : 'Something went wrong in adding movie results to movieStore' }
-      console.log(message)
+    request.onerror = (error) => {
+      console.log('Something went wrong in adding movie results to movieStore', error)
     }
   },
 
@@ -273,24 +255,22 @@ const APP = {
     let store = transaction.objectStore('suggestStore')
     let request = store.add(suggestResults)
 
-    request.onsuccess = () => {
-      let message = { event_description : 'Successfully added suggested movies to suggestStore' }
-      console.log(message)
+    request.onsuccess = (event) => {
+      console.log('Successfully added suggested movies to suggestStore', event)
     }
-    request.onerror = () => {
-      let message = { event_description : 'Something went wrong in adding suggested to movieStore' }
-      console.log(message)
+    request.onerror = (error) => {
+      console.log('Something went wrong in adding suggested to movieStore', error)
     }
   },
 
   buildList(movies) {
     let params = new URL(document.location).searchParams;
     let keyword = params.get('keyword');
-    APP.getResultsTitle(keyword)
+    APP.postResultsTitle(keyword)
     
     let searchQuery = new URL(document.location).searchParams
     let ref = searchQuery.get('ref')
-    APP.getSuggestTitle(ref)
+    APP.postSuggestTitle(ref)
 
     let container = document.querySelector('.movies')
     container.innerHTML = movies.results
@@ -316,18 +296,10 @@ const APP = {
         <p class= "movieLang">${movie.original_language}</p>
       </div>
       <div class="card-action">
-        <a href="#" class="find-suggested teal-text text-accent-4">Show Similar Movies<i class="material-icons right">theaters</i></a>
+        <a href="#" class="find-suggested teal-text text-accent-4">See Recommended Movies<i class="material-icons right">theaters</i></a>
       </div>
     </div>`
-    }).join('\n') // array of html that will be joined together
-  },
-
-  makeTransaction (storeName, mode) {
-    let transaction = APP.db.transaction(storeName, mode)
-    transaction.onerror = (error) => {
-      console.log(error)
-    }
-    return transaction
+    }).join('\n') 
   },
 
   openDB() {
@@ -356,13 +328,34 @@ const APP = {
     })
   },
 
+  makeTransaction (storeName, mode) {
+    let transaction = APP.db.transaction(storeName, mode)
+    transaction.onerror = (error) => {
+      console.log(error)
+    }
+    return transaction
+  },
+  
+  postResultsTitle(keyword) {
+    let keywordSpan = document.querySelector('.ref-keyword');
+    if (keyword && keywordSpan) {
+      return keywordSpan.textContent = keyword;
+    }
+  },
+  
+  postSuggestTitle(ref) {
+    let suggestSpan = document.querySelector('.ref-keyword');
+    if (ref && suggestSpan) {
+      suggestSpan.textContent = ref;
+    }
+  },
+
   clearForm (event) {
-    // clears the form 
-    if (event) event.preventDefault() // prevents the page from reloading
+    if (event) event.preventDefault() 
     document.getElementById('searchForm').reset() 
   }
   
-  }
+}
 
 document.addEventListener('DOMContentLoaded', APP.init)
 
