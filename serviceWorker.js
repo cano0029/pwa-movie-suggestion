@@ -1,6 +1,6 @@
 
-const DYNAMIC_CACHE = "dynamic-v2"
-const STATIC_CACHE = "static-v2"
+const DYNAMIC_CACHE = "dynamic-3"
+const STATIC_CACHE = "static-v3"
 const OFFLINE_URL = '/404.html'
 const maxCacheSize = 50
 
@@ -34,28 +34,23 @@ function limitCacheSize(cacheName, maxCacheSize) {
     .then(keys => {
       if (keys.length > maxCacheSize) {
         cache.delete(keys[0])
-        .then(limitCacheSize(cacheName, maxCacheSize)) // recalling function over and over again until if argument is no longer true
+        .then(limitCacheSize(cacheName, maxCacheSize))
       }
     })
   })
 }
 
-// listen when service worker is installed - then create static cache
 self.addEventListener('install', event => {
-  // adding static cache assets
   event.waitUntil(
     (async () => {
       const cache = await caches.open(STATIC_CACHE)
       console.log('Caching static assets')
-      await cache.addAll(STATIC_ASSETS) // goes to the server and finds the assets to put into static cache
+      await cache.addAll(STATIC_ASSETS) 
     })()
   )
-  // Force the waiting service worker to become the active service worker without the user having to reload the page
-  console.log('Service worker has been installed', event)
-  self.skipWaiting() // presses skipWaiting by itself and it triggers the activate event
+  self.skipWaiting()
 })
 
-// delete old caches, before activating most recent caches version (dynamic and static)
 self.addEventListener('activate', event => {
   event.waitUntil(
     (async() => {
@@ -66,12 +61,9 @@ self.addEventListener('activate', event => {
           )
     })()
   )
-   // Tell the active service worker to take control of the page(s) immediately. User will not have to refresh the browser twice to make new service worker active
-  self.clients.claim(); // but should put in checks before doing this, old service worker may be caching some sort of info for example that you may need
-  console.log('Service worker has been activated')
+  self.clients.claim(); 
 })
 
-// create and return dynamic cache if offline
 self.addEventListener('fetch', event => {
   if (event.request.method === 'GET') {
   event.respondWith(
@@ -98,22 +90,19 @@ self.addEventListener('fetch', event => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.mode === "navigate") {
-    // only want to respond with our offline if browser or user is trying to do something in a NEW page, not in the current page
     event.respondWith(
       (async () => {
         try {
           const preloadResponse = await event.preloadResponse;
-          if (preloadResponse) { // if we yes, return that page
+          if (preloadResponse) { 
             return preloadResponse;
           }
 
-          // if it was not pre-fetch, try the network
           const networkResponse = await fetch(event.request);
-          return networkResponse; // if yes, return that page
+          return networkResponse;
 
         } catch (error) {
           console.log("Fetch failed; returning offline page instead.", error);
-          // if error, return that cached page during initialize
           const cache = await caches.open(STATIC_CACHE);
           const cachedResponse = await cache.match(OFFLINE_URL);
           return cachedResponse;
@@ -123,7 +112,6 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
-// sends message to the service worker
 self.addEventListener('message', ({ data }) => {
   console.log('Message from service worker', data)
 })
