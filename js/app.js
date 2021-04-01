@@ -1,8 +1,5 @@
 // TO DO: 
-// switch to ES6 modules in type script (package.json)
 // put html under pages at root
-// separate functions search results for "" 
-// change navigator sw messages back to console logs
 
 const APP = {  
   apiKey: '8b315e48d59ed2c712994a028435c067',
@@ -200,7 +197,7 @@ const APP = {
     try {
       if (!response.ok) throw new Error(response.message)
         let movieResults = {
-          keyword: keyword, // TO DO: switch to ES6 modules in type script (package.json)
+          keyword, 
           results: await response.json()
         }
       return APP.saveResults(movieResults)
@@ -217,7 +214,7 @@ const APP = {
       try {
         if (response.ok) {
           let suggestResults = {
-              id: id, // TO DO: switch to ES6 modules in type script (package.json)
+              id, 
               results: await response.json()
           }
           return APP.saveSuggest(suggestResults)
@@ -354,7 +351,7 @@ const APP = {
     if (event) event.preventDefault() 
     document.getElementById('searchForm').reset() 
   }
-  
+
 }
 
 document.addEventListener('DOMContentLoaded', APP.init)

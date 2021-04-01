@@ -1,0 +1,24 @@
+{
+  "name": "pwasuggestmovie",
+  "version": "1.0.0",
+  "description": "",
+  "main": "serviceWorker.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cano0029/pwa-movie-suggestion.git"
+  },
+  "author": "Johanna Cano <cano0029@algonquinlive.com>",
+  "contributors": [
+    "Robert McKenney <mckennr@algonquincollege.com>",
+    "Steve Griffith <cano0029@algonquinlive.com>"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cano0029/pwa-movie-suggestion/issues"
+  },
+  "homepage": "https://github.com/cano0029/pwa-movie-suggestion#readme"
+}
