@@ -1,5 +1,5 @@
-const DYNAMIC_CACHE = 'dynamic-3'
-const STATIC_CACHE = 'static-v3'
+const DYNAMIC_CACHE = 'dynamic-v2'
+const STATIC_CACHE = 'static-v2'
 const OFFLINE_URL = '/404.html'
 const maxCacheSize = 50
 
