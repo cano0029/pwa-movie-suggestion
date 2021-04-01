@@ -21,7 +21,7 @@ const STATIC_ASSETS = [
   '/img/icons/safari-pinned-tab.svg',
   '/img/logo/logo.png',
   '/img/logo/tmdb-logo.svg',
-  '/img/gr-stocks-q8P8YoR6erg-unsplash.jpg',
+  '/img/stock-image.jpg',
   '/manifest.json',
   'https://fonts.googleapis.com/icon?family=Material+Icons',
   'https://fonts.gstatic.com/s/materialicons/v82/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2',
