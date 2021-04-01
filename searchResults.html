@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>josMovies | Suggested Movies</title>
+  <title> josMovies | Search Results</title>
   
   <!-- materialize fonts and icons -->
   <link type= "text/css" rel="stylesheet" href="/css/materialize.min.css">
@@ -41,9 +41,9 @@
   <!-- search bar -->
   <nav id = "searchBar" class = "container transparent">
     <div class="nav-wrapper transparent">
-      <form id = "searchForm" action = "./pages/searchResults.html" method= "GET">
+      <form id = "searchForm">
         <div class="input-field blue-grey darken-3">
-          <input type="search" id="search" placeholder = "Search for movies" required  class="autocomplete">
+          <input type="search" id="search" placeholder = "Search for movies"required  class="autocomplete">
           <label for = "search" class="label-icon" for="search"><i class="material-icons black-text">search</i></label>
           <i class="material-icons" id="closeSearchBtn">close</i>
         </div>
@@ -51,20 +51,21 @@
     </div>
   </nav>
 
-  <!-- Suggested Results -->
-  <section class="page" id="">
-    <div class="container">
-      <h6 class= "white-text">Suggested Movies for "<span class = "ref-keyword teal-text text-accent-4"></span>"</h6>
-      <div class="movies">
-        <!-- cards for search result movies go here -->
+  <!-- Search Results -->
+    <section class="page" id="">
+      <div class="container">
+        <h6 class= "white-text">Search Results for "<span class = "ref-keyword teal-text text-accent-4"></span>"</h6>
+        <div class="movies">
+
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
   <!-- materialize script -->
   <script type="text/javascript" src="/js/materialize.min.js"></script>
+  
   <!-- main script -->
-  <script type="module" src="../js/app.js"></script>
+  <script type="module" src="/js/app.js"></script>
 </body>
 
 </html>

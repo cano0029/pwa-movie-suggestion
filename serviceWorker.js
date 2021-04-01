@@ -1,12 +1,13 @@
 
-const DYNAMIC_CACHE = "dynamic-v1"
-const STATIC_CACHE = "static-v1"
-const OFFLINE_URL = '/pages/404.html'
+const DYNAMIC_CACHE = "dynamic-v2"
+const STATIC_CACHE = "static-v2"
+const OFFLINE_URL = '/404.html'
+const maxCacheSize = 50
 
 const STATIC_ASSETS = [
   '/',
   '/home.html', 
-  '/pages/404.html',
+  '/404.html',
   '/css/app.css',
   '/css/materialize.min.css',
   '/js/app.js',
@@ -27,13 +28,13 @@ const STATIC_ASSETS = [
   'https://fonts.gstatic.com/s/materialicons/v82/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2'
 ]
 
-function maxCacheSize(cacheName, maxSize) {
+function limitCacheSize(cacheName, maxCacheSize) {
   caches.open(cacheName)
   .then(cache => { cache.keys()
     .then(keys => {
-      if (keys.length > maxSize) {
+      if (keys.length > maxCacheSize) {
         cache.delete(keys[0])
-        .then(maxCacheSize(cacheName, maxSize)) // recalling function over and over again until if argument is no longer true
+        .then(limitCacheSize(cacheName, maxCacheSize)) // recalling function over and over again until if argument is no longer true
       }
     })
   })
@@ -83,7 +84,7 @@ self.addEventListener('fetch', event => {
       try{
         const networkResponse = await fetch(event.request)
         dynamicCache.put(event.request, networkResponse.clone())
-        maxCacheSize(DYNAMIC_CACHE, 50)
+        limitCacheSize(DYNAMIC_CACHE, maxCacheSize)
         return networkResponse
       } catch(error) {
         console.log(error, "Returning offline page instead");

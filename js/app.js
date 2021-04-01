@@ -24,7 +24,8 @@ const APP = {
   init() {
     try {
       if('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
+        window.addEventListener('load', (event) => {
+          console.log('Service worker registered', event)
           navigator.serviceWorker.register('/serviceWorker.js')
         })
       }
@@ -39,8 +40,7 @@ const APP = {
   
   addListeners() {
 
-    window.addEventListener('online', (event) => {
-      console.log(event)
+    window.addEventListener('online', () => {
       let message = {
         isOnline: true,
         description: 'Connection back online'
@@ -48,8 +48,7 @@ const APP = {
       navigator.serviceWorker.controller.postMessage(message)
     })
 
-    window.addEventListener('offline', (event) => {
-      console.log(event)
+    window.addEventListener('offline', () => {
       let message = {
         isOnline: false,
         description: 'Connection lost. Offline.'
@@ -62,7 +61,7 @@ const APP = {
       APP.deferredInstall = event
     });
 
-    window.addEventListener('appinstalled', (event) => {
+    window.addEventListener('appinstalled', () => {
       let message = {
         appInstalled: true
       }
@@ -114,7 +113,7 @@ const APP = {
       let title = card.querySelector('.card-title span').textContent;
       let mid = card.getAttribute('data-id');
       let base = location.origin;
-      let url = new URL('/pages/suggestedMovies.html', base);
+      let url = new URL('/suggestedMovies.html', base);
       url.search = `?movie_id=${mid}&ref=${encodeURIComponent(title)}`;
       location.href = url;
     }
@@ -128,7 +127,7 @@ const APP = {
       if (keyword){
         event.preventDefault()
         let base = location.origin
-        let url = new URL('/pages/searchResults.html', base) 
+        let url = new URL('/searchResults.html', base) 
         url.search = '?keyword=' + encodeURIComponent(keyword)
         location.href = url  
         APP.clearForm()
