@@ -1,29 +1,21 @@
-/* general - applicable to all pages*/
+/* * * general * * */
 html {
   font-size: 14px;
 }
 body {
   background-color: #0f1416;
 }
-
 nav {
   height: 4.5rem;
 }
-
 #logo {
   width: 10%;
   margin-right: 1rem;
   transform: translateY(0.2rem)
 }
-form #searchForm {
-  outline: none;
-  border: none;
-  box-shadow: none;
-}
-
 input#search {
   top: 0;
-  border-radius: 10px;
+  border-radius: 40px;
   margin-top: 2rem;
   margin-bottom: 2rem;
   box-shadow: none;
@@ -32,33 +24,28 @@ input#search {
   border-radius: 40px;
   height: 1rem;
 }
-
 ::placeholder {
   color: rgba(0, 0, 0, 0.419);
-  opacity: 1; /* Firefox */
+  opacity: 1; 
 }
-
 .page h6.white-text {
   margin-top: 2rem;
   margin-left: 1rem;
   line-height: 25px;
 }
 
-/* home page */
-
+/* * * home page * * */
 .moviedb-logo{
   width: 20%;
   margin: 0 auto;
   margin-top: 10rem;
 }
-
 .btn-container {
   margin: 5rem;
   display: flex;
   justify-content: center;
   background: none;
 }
-
 #btnInstall {
   display: flex;
   flex-direction: row;
@@ -76,12 +63,8 @@ input#search {
   padding-left: 0.5rem;
 }
 #homeInstructions {
-  margin-top: 5rem;
-  margin-bottom: 5rem;
-  margin-left: 2rem;
-  margin-right: 2rem;
+  margin: 5rem 2rem;
 }
-
 a.brand-logo{
   display: flex;
   justify-content: center;
@@ -89,16 +72,12 @@ a.brand-logo{
   font-size: 20px;
   font-weight: 600;
 }
-span.movie-logo {
-  color: #00bfa5;
-}
 
-/* search and suggested pages */
+/* * * search and suggested pages * * */
 #titlePage h5 {
   margin-bottom: 2rem;
   font-size: 1rem;
 }
-
 h5 span {
   font-size: 20px;
 }
@@ -107,19 +86,17 @@ h5 span {
   margin: 3rem auto;
   box-shadow: 8px 10px 20px black
 }
-
 .movieLang {
   margin-top: 3rem;
   text-transform: uppercase ;
 }
 
-/* offline page */
+/* * * offline page * * */
 #offline {
   margin-top: 4rem;
 }
 #offline h5, span#button{
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin-top: 2rem 0rem;
 }
 #cloud-off{
   font-size: 4rem;
