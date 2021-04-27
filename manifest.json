@@ -1,7 +1,7 @@
 {
   "name": "josMovies Suggestions",
   "short_name": "josMovies",
-  "start_url": "/home.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#0f1416",
   "theme_color": "#00b8d4",

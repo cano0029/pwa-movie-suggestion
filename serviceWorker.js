@@ -5,7 +5,9 @@ const maxCacheSize = 50
 
 const STATIC_ASSETS = [
   '/',
-  '/home.html',
+  '/index.html',
+  '/searchResults.html',
+  '/suggestedMovies.html',
   '/404.html',
   '/css/app.css',
   '/css/materialize.min.css',
